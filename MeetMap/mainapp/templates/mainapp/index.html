@@ -1,1 +1,16 @@
-This is the main page that people see when they visit our website
+{% load bootstrap3 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+
+
+<div class="container">
+    <div class="col-md-4"> Test</div>
+    <div class="col-md-5"> Testing</div>
+    <div class="'col-md-3"> Test haha </div>
+    <h1>This is the main page that people see when they visit our website.</h1>
+</div>
