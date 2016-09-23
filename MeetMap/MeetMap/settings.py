@@ -76,18 +76,14 @@ WSGI_APPLICATION = 'MeetMap.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
-    #'default': {
-    #        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #        'NAME': 'webapp_db',
-    #        'USER': 'postgres',
-    #        'PASSWORD': 'Whatcunt1',
-    #        'HOST': 'localhost',
-    #        'PORT': '8000',
-    #    }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'meetmap',
+            'USER': 'myuser',
+            'PASSWORD': 'password',
+            'HOST': 'localhost',
+            'PORT': '',
+        }
 }
 
 
