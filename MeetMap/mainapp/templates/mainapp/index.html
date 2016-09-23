@@ -1,15 +1,29 @@
-{% load bootstrap3 %}
+{% load static %}
 
-{# Load CSS and JavaScript #}
-{% bootstrap_css %}
-{% bootstrap_javascript %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static "/mainapp/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+    <title>MeetMap</title>
+  </head>
 
-{# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
+  <body>
+    <div class="container">
+      <form action="{% url 'mainapp:test' }" method="post">
+        {% csrf_token %}
+        <label for="username">Enter username: </label>
+        <br>
+        <input id="username" type="text" name="username" value="{{ username }}">
+        <br>
+        <br>
+        <button type="button" class="btn btn-primary">Submit</button>
+      </form>
+    </div>
 
-<div class="container">
-    <div class="col-md-4"> Test</div>
-    <div class="col-md-5"> Testing</div>
-    <div class="'col-md-3"> Test haha </div>
-    <h1>This is the main page that people see when they visit our website.</h1>
-</div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="{% static "/mainapp/bootstrap/js/bootstrap.min.js" %}"></script>
+  </body>
+
+</html>
