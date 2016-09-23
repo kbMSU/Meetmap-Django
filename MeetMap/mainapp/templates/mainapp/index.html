@@ -5,21 +5,33 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="{% static "/mainapp/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static "/mainapp/index.css" %}" rel="stylesheet">
     <title>MeetMap</title>
   </head>
 
   <body>
-    <div class="container">
-      <form action="{% url 'mainapp:test' }" method="post">
-        {% csrf_token %}
-        <label for="username">Enter username: </label>
-        <br>
-        <input id="username" type="text" name="username" value="{{ username }}">
-        <br>
-        <br>
-        <button type="button" class="btn btn-primary">Submit</button>
-      </form>
+    <div class="container-fluid vertical-center">
+      <div class="loginform">
+        <form>
+          <h1 class="header text-center">MeetMap</h1>
+          <div class="form-group">
+            <label for="usernameInput">Enter username: </label>
+            <input type="username" class="form-control" id="usernameInput"
+              placeholder="Username">
+          </div>
+          <div class="form-group">
+            <label for="passwordInput">Enter password: </label>
+            <input type="password" class="form-control" id="passwordInput"
+              placeholder="Password">
+          </div>
+          <button type="button" class="btn btn-primary button">
+            Login
+          </button>
+          <button type="button" class="btn btn-link button">
+            Don't have an account ? Register here
+          </button>
+        </form>
+      </div>
     </div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
