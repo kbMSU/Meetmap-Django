@@ -5,6 +5,7 @@ from . import views
 app_name = 'mainapp'
 
 urlpatterns = [
-    url(r'^test/', views.test, name='test'),
-    url(r'^', views.index, name='index'),
+    url(r'^signup/', views.signup, name='signup'),
+    url(r'^main/', views.main, name='main'),
+    url(r'^', views.login, name='login'),
 ]
