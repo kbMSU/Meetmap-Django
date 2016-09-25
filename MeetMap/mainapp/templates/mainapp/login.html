@@ -26,7 +26,10 @@
           The 'method' tag indicates whether it is a GET or a POST
         -->
         <form action="/" method="post">
-          <!-- Django's inbuild CSRF protection -->
+          <!--
+            Django's inbuilt CSRF protection.
+            This is a MUST for every form
+          -->
           {% csrf_token %}
           <h1 class="header text-center">MeetMap</h1>
           <!--
@@ -92,6 +95,9 @@
             <strong>Login Failed!</strong> Password is required but missing
           </div>
           {% endif %}
+          <!--
+            If invalidData is true display the proper error message
+          -->
           {% if invalidData %}
           <div class="alert alert-danger alert-dismissable" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
@@ -103,10 +109,18 @@
             You must enter letters, numbers or special characters
           </div>
           {% endif %}
+          <!--
+            This button will "submit" the form. This is indicated by its
+            type="submit" attribute
+          -->
           <button id="loginButton" type="submit" class="btn btn-primary button">
             Login
           </button>
         </form>
+        <!--
+          This button is the link style button that will take you to the signup page
+          The page to go to is indicated by the href.
+        -->
         <a href="{% url 'mainapp:signup' %}" type="button" class="btn btn-link button">
           Don't have an account ? Register here
         </a>

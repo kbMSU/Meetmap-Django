@@ -31,7 +31,7 @@ def login(request):
         # and none of the fields are empty spaces. Ex. "       "
         # If you need only some of the fields filled out then this method
         # is useless and you have to check each field manually.
-        # I show you how to do that in the else part
+        # I show you how to do that in the else part of this if statement
         if loginForm.is_valid():
             # Get the username from the form
             username = loginForm.cleaned_data['username']
@@ -79,16 +79,16 @@ def login(request):
         # the already filled out information
         'form':loginForm,
         # If loginFailed is true the HTML will display an
-        # appropriat error
+        # appropriate error
         'loginFailed':loginFailed,
         # If usernameMissing is true the HTML will display an
-        # appropriat error
+        # appropriate error
         'usernameMissing':usernameMissing,
         # If passwordMissing is true the HTML will display an
-        # appropriat error
+        # appropriate error
         'passwordMissing':passwordMissing,
         # If passwordMissing is true the HTML will display an
-        # appropriat error
+        # appropriate error
         'invalidData':invalidData
     }
 
