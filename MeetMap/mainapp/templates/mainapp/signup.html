@@ -1,1 +1,207 @@
-<h1>This is the signup page</h1>
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Link the CSS and Javascript files to the HTML -->
+    <link href="{% static "/mainapp/css/login.css" %}" rel="stylesheet">
+    <!-- The JQuery script MUST be declared before the Bootstrap script -->
+    <script src="{% static "/mainapp/jquery/jquery.js" %}"></script>
+    <script src="{% static "/mainapp/bootstrap/js/bootstrap.js" %}"></script>
+    <!-- This is our own Javascript file for this page. It is empty -->
+    <script src="{% static "/mainapp/js/login.js" %}"></script>
+    <title>MeetMap</title>
+  </head>
+
+  <body>
+    <div class="container-fluid vertical-center">
+      {% if registerSuccess %}
+        <h1> SUCCESS </h1>
+      {% else %}
+        <div class="loginform">
+        <!--
+          This is our form.
+          The 'action' tag indicate which page
+          to go to when the form is submitted
+          '/' means go to the first page ( which is this page itself )
+          The 'method' tag indicates whether it is a GET or a POST
+        -->
+            <form action="/signup/" method="post">
+              <!--
+                Django's inbuilt CSRF protection.
+                This is a MUST for every form
+              -->
+              {% csrf_token %}
+              <h1 class="header text-center">MeetMap</h1>
+              <h2 class="text-center">Signup for an account</h2>
+              <!--
+                Display the username field and link it to the username field
+                in the form that was given to the HTML by the Python code
+              -->
+              <div class="form-group">
+                <label for="id_{{ form.username.name }}">{{ form.username.label }}</label>
+                <input type="username" class="form-control"
+                  id="id_{{ form.username.name }}"
+                  name="{{ form.username.name }}"
+                  value="{{ form.username.value|default_if_none:"" }}"
+                  placeholder="Username">
+              </div>
+              <!--
+                Display the password1 field and link it to the password1 field
+                in the form that was given to the HTML by the Python code
+              -->
+              <div class="form-group">
+                <label for="id_{{ form.password1.name }}">{{ form.password1.label }}</label>
+                <input type="password" class="form-control"
+                  id="id_{{ form.password1.name }}"
+                  name="{{ form.password1.name }}"
+                  value="{{ form.password1.value|default_if_none:"" }}"
+                  placeholder="Password">
+              </div>
+              <!--
+                Display the password2 field and link it to the password2 field
+                in the form that was given to the HTML by the Python code
+              -->
+              <div class="form-group">
+                <label for="id_{{ form.password2.name }}">{{ form.password2.label }}</label>
+                <input type="password" class="form-control"
+                  id="id_{{ form.password2.name }}"
+                  name="{{ form.password2.name }}"
+                  value="{{ form.password2.value|default_if_none:"" }}"
+                  placeholder="Confirm Password">
+              </div>
+              <!--
+                Display the email field and link it to the email field
+                in the form that was given to the HTML by the Python code
+              -->
+              <div class="form-group">
+                <label for="id_{{ form.email.name }}">{{ form.email.label }}</label>
+                <input type="email" class="form-control"
+                  id="id_{{ form.email.name }}"
+                  name="{{ form.email.name }}"
+                  value="{{ form.email.value|default_if_none:"" }}"
+                  placeholder="Email">
+              </div>
+              <!--
+                If loginFailed is true display the proper error message
+              -->
+              {% if registerFailed %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Register Failed!</strong> Invalid username or password
+              </div>
+              {% endif %}
+              <!--
+                If usernameMissing is true display the proper error message
+              -->
+              {% if usernameMissing %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Register Failed!</strong> Username is required but missing
+              </div>
+              {% endif %}
+              <!--
+                If usernameExists is true display the proper error message
+              -->
+              {% if usernameExists %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Register Failed!</strong> This Username is already taken
+              </div>
+              {% endif %}
+              <!--
+                If passwordMissing is true display the proper error message
+              -->
+              {% if passwordMissing %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Register Failed!</strong> Password is required but missing
+              </div>
+              {% endif %}
+              <!--
+                If emailMissing is true display the proper error message
+              -->
+              {% if emailMissing %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Register Failed!</strong> Email is required but missing
+              </div>
+              {% endif %}
+              <!--
+                If passwordsDontMatch is true display the proper error message
+              -->
+              {% if passwordsDontMatch %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Register Failed!</strong> The passwords don't match
+              </div>
+              {% endif %}
+              <!--
+                If passwordTooShort is true display the proper error message
+              -->
+              {% if passwordTooShort %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Register Failed!</strong> The passwords must be at least 6 characters long
+              </div>
+              {% endif %}
+              <!--
+                If invalidData is true display the proper error message
+              -->
+              {% if invalidData %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Invalid Data!</strong>
+                You must enter letters, numbers or special characters
+              </div>
+              {% endif %}
+              <!--
+                This button will "submit" the form. This is indicated by its
+                type="submit" attribute
+              -->
+              <br>
+              <button id="registerButton" type="submit" class="btn btn-primary button">
+                Register
+              </button>
+            </form>
+          </div>
+      {% endif %}
+
+    </div>
+  </body>
+
+</html>
