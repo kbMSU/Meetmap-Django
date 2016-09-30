@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="07c661b6-b213-4089-b445-9a7027eab3f7" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mainapp/static/mainapp/css/sidebar.css" afterPath="$PROJECT_DIR$/mainapp/static/mainapp/css/sidebar.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mainapp/templates/mainapp/main.html" afterPath="$PROJECT_DIR$/mainapp/templates/mainapp/main.html" />
     </list>
     <ignored path="MeetMap.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -597,7 +595,14 @@
       <option name="project" value="LOCAL" />
       <updated>1475219319326</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Add a left sidebar at main page:&#10;changes:1. add sidebar.css to mainapp/static/css &#10;2. add main.html to templates/mainapp">
+      <created>1475223591615</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1475223591615</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
