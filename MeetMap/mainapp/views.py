@@ -142,39 +142,29 @@ def signup(request):
             password2 = registerForm.cleaned_data['password2']
             # Get the email from the form
             email = registerForm.cleaned_data['email']
-            # The passwords don't match
-
             # Check that the passwords match
             if password1 == password2:
-
                 # Check that the password is the right length
                 if len(password1) > 5:
-
                     # Check that the username does not already exist in the database
                     if not User.objects.filter(username=username).exists():
-
                         try:
-                            user = User.objects.create_user(username, email, password1)
-                            user.Save()
-                            registerSuccess = True
+                            newUser = User.objects.create_user(username, email, password1)
+                            newUser.save()
                         except:
                             registerFailed = True
-
-
+                        else:
+                            registerSuccess = True
                     # The username is already taken
                     else:
                         usernameExists = True
-
                 # The password is too short
                 else:
                     # Mark password as too short
                     passwordTooShort = True
-
             else:
                 # Mark passwords as not matching
                 passwordsDontMatch = True
-
-
         # If the form is not filled
         # Here we will check each field to see what is missing and
         # display the proper message
@@ -197,8 +187,6 @@ def signup(request):
             # So we have to account for this
             if not usernameMissing and not passwordMissing and not emailMissing:
                 invalidData = True
-
-
 
     # This is the data that the HTML expects. It is just a JSON object
     # The HTML can use any of this data

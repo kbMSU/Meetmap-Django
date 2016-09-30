@@ -1,6 +1,12 @@
 @import url("../bootstrap/css/bootstrap.min.css");
 
-.loginform {
+.signupform {
+  width: 400px;
+  margin: 0 auto;
+  align-self: center;
+}
+
+.signupsuccess {
   width: 400px;
   margin: 0 auto;
   align-self: center;

@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Link the CSS and Javascript files to the HTML -->
-    <link href="{% static "/mainapp/css/login.css" %}" rel="stylesheet">
+    <link href="{% static "/mainapp/css/signup.css" %}" rel="stylesheet">
     <!-- The JQuery script MUST be declared before the Bootstrap script -->
     <script src="{% static "/mainapp/jquery/jquery.js" %}"></script>
     <script src="{% static "/mainapp/bootstrap/js/bootstrap.js" %}"></script>
@@ -18,9 +18,15 @@
   <body>
     <div class="container-fluid vertical-center">
       {% if registerSuccess %}
-        <h1> SUCCESS </h1>
+        <div class="signupsuccess">
+          <h1 class="header text-center">MeetMap</h1>
+          <h2 class="text-center">Registration Successful</h1>
+          <a href="{% url 'mainapp:login' %}" type="button" class="btn btn-link button">
+            Go back to login
+          </a>
+        </div>
       {% else %}
-        <div class="loginform">
+        <div class="signupform">
         <!--
           This is our form.
           The 'action' tag indicate which page
@@ -85,7 +91,7 @@
                   placeholder="Email">
               </div>
               <!--
-                If loginFailed is true display the proper error message
+                If registerFailed is true display the proper error message
               -->
               {% if registerFailed %}
               <div class="alert alert-danger alert-dismissable" role="alert">
