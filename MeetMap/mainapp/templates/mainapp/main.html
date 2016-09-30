@@ -1,1 +1,45 @@
-<h1>This is the main page</h1>
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Link the CSS and Javascript files to the HTML -->
+    <link href="{% static "/mainapp/css/login.css" %}" rel="stylesheet">
+    <!-- The JQuery script MUST be declared before the Bootstrap script -->
+    <script src="{% static "/mainapp/jquery/jquery.js" %}"></script>
+    <script src="{% static "/mainapp/bootstrap/js/bootstrap.js" %}"></script>
+    <!-- This is our own Javascript file for this page. It is empty -->
+    <script src="{% static "/mainapp/js/login.js" %}"></script>
+    <title>MeetMap</title>
+    <link href="{% static "/mainapp/css/sidebar.css" %}" rel="stylesheet">
+</head>
+
+<body>
+
+<div id="wrapper">
+    <div id="sidebar-wrapper">
+        <!--
+          This is our Main page left Sidebar.
+        -->
+        <ul class="sidebar-nav">
+            <li class="sidebar-brand">
+                <a href="#">
+                    Meet Map
+                </a>
+            </li>
+            <li>
+                <a href="#">Profile</a>
+            </li>
+            <li>
+                <a href="#">Map</a>
+            </li>
+            <li>
+                <a href="#">My Meets</a>
+            </li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
