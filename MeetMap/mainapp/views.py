@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.template import loader
-from django.contrib import auth #authenticate, login, get_user
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
 from .forms import LoginForm, RegisterForm
@@ -40,7 +40,7 @@ def login(request):
             password = loginForm.cleaned_data['password']
             # Ask Django to see if this user exists
             # If the user exists, this method will authenticate/login the user
-            user = auth.authenticate(username=username,password=password)
+            user = authenticate(username=username,password=password)
             # If the user does exist
             if user is not None:
                 # Go to the main page
@@ -155,6 +155,7 @@ def signup(request):
                             registerFailed = True
                         else:
                             registerSuccess = True
+                            authenticate(username=username,password=password1)
                     # The username is already taken
                     else:
                         usernameExists = True
