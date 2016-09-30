@@ -231,6 +231,8 @@ def signup(request):
     # The data field is optional
     return render(request, 'mainapp/signup.html', data)
 
+def createprofile(request):
+    return render(request,'mainapp/createProfile.html')
 
 def main(request):
     return render(request, 'mainapp/main.html')
