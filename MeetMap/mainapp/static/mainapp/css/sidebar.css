@@ -13,20 +13,35 @@
    color: #f47742;
  }
 
+.main-content {
+    float: right;
+    min-height: 100%;
+    width: 80%;
+}
+
 .sidebar-nav {
     position: absolute;
     min-height: 100%;
     top: 0;
-    width: 250px;
+    width: 20%;
     margin: 0;
     padding: 0;
     list-style: none;
     background-color: #000000;
 }
 
+.sidebar-list {
+    min-height: 100%;
+    top: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
 .sidebar-nav li {
     text-indent: 20px;
     line-height: 40px;
+    font-size: 20px;
 }
 
 .sidebar-nav li a {

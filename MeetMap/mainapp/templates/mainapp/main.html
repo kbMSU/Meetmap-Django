@@ -13,7 +13,8 @@
 </head>
 
 <body>
-  <ul class="sidebar-nav">
+  <div class="sidebar-nav">
+    <ul class="sidebar-list">
       <li class="sidebar-brand">
           <h1 class="header">MeetMap</h1>
       </li>
@@ -26,7 +27,12 @@
       <li>
           <a href="#">My Meets</a>
       </li>
-  </ul>
+    </ul>
+  </div>
+  <div class="main-content">
+    {% block content %}
+    {% endblock %}
+  </div>
 </body>
 
 </html>
