@@ -6,7 +6,9 @@ app_name = 'mainapp'
 
 urlpatterns = [
     url(r'^signup/', views.signup, name='signup'),
-    url(r'^main/', views.main, name='main'),
     url(r'^createprofile/', views.createprofile, name='createprofile'),
+    url(r'^profile/', views.profile, name='profile'),
+    url(r'^map/', views.map, name='map'),
+    url(r'^mymeets/', views.mymeets, name='mymeets'),
     url(r'^', views.login, name='login'),
 ]

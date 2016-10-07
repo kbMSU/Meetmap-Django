@@ -45,7 +45,7 @@ def login(request):
             # If the user does exist
             if user is not None:
                 # Go to the main page
-                return HttpResponseRedirect('/main/')
+                return HttpResponseRedirect('/map/')
             # If the user does NOT exist
             else:
                 # Tell the HTML that username/password is invalid
@@ -238,5 +238,11 @@ def signup(request):
 def createprofile(request):
     return render(request,'mainapp/createProfile.html')
 
-def main(request):
-    return render(request, 'mainapp/main.html')
+def profile(request):
+    return render(request,'mainapp/profile.html')
+
+def map(request):
+    return render(request,'mainapp/map.html')
+
+def mymeets(request):
+    return render(request,'mainapp/mymeets.html')
