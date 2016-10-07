@@ -6,7 +6,7 @@
 @import url("../bootstrap/css/bootstrap.min.css");
 
  body {
-    overflow-x: hidden;
+  overflow-x: hidden;
  }
 
  .header {
@@ -14,49 +14,49 @@
  }
 
 .main-content {
-    float: right;
-    min-height: 100%;
-    width: 80%;
+  position: relative;
+  min-height: 100%;
+  left: 200px;
 }
 
 .sidebar-nav {
-    position: absolute;
-    min-height: 100%;
-    top: 0;
-    width: 20%;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    background-color: #000000;
+  position: absolute;
+  min-height: 100%;
+  top: 0;
+  width: 200px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background-color: #000000;
 }
 
 .sidebar-list {
-    min-height: 100%;
-    top: 0;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  min-height: 100%;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .sidebar-nav li {
-    text-indent: 20px;
-    line-height: 40px;
-    font-size: 20px;
+  text-indent: 20px;
+  line-height: 40px;
+  font-size: 20px;
 }
 
 .sidebar-nav li a {
-    display: block;
-    text-decoration: none;
-    color: #999999;
+  display: block;
+  text-decoration: none;
+  color: #999999;
 }
 
 .sidebar-nav li a:hover {
-    text-decoration: none;
-    color: #fff;
-    background: rgba(255,255,255,0.2);
+  text-decoration: none;
+  color: #fff;
+  background: rgba(255,255,255,0.2);
 }
 
 .sidebar-nav li a:active,
 .sidebar-nav li a:focus {
-    text-decoration: none;
+  text-decoration: none;
 }
