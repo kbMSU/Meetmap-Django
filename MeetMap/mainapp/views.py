@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.template import loader
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from mainapp.models import UserProfile
 
 from .forms import LoginForm, RegisterForm
 
@@ -151,6 +152,8 @@ def signup(request):
                         try:
                             newUser = User.objects.create_user(username, email, password1)
                             newUser.save()
+                            newUserProfile = UserProfile(user=newUser)
+                            newUserProfile.save()
                         except:
                             registerFailed = True
                         else:
