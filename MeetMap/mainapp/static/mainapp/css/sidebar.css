@@ -9,6 +9,10 @@
     overflow-x: hidden;
  }
 
+ .header {
+   color: #f47742;
+ }
+
 /* Toggle Styles */
 
 #wrapper {
