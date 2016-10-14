@@ -12,7 +12,30 @@ $( document ).ready(function() {
     buttons: {
       Cancel: function() {
         $(this).dialog("close");
+      },
+      Save : function() {
+        save_event();
       }
     }
   });
+
+  function save_event() {
+    console.log("saving event") // sanity check
+    $.ajax({
+      url : "/create_event/",
+      type : "POST",
+      data : {},
+
+      success : function(json) {
+        console.log(json)
+        console.log("success");
+      },
+
+      error : function(xhr,errmsg,err) {
+        console.log(errmsg);
+        console.log("error saving event");
+      }
+    });
+  };
+
 });

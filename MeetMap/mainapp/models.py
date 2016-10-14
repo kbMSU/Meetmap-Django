@@ -25,8 +25,8 @@ class Location(models.Model):
 class Event(models.Model):
     name = models.CharField(max_length=100)
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
-    time = models.DateTimeField()
-    duration = models.DurationField()
+    from_time = models.DateTimeField()
+    to_time = models.DateTimeField(null=True)
     description = models.CharField(max_length=500)
     picture = models.ImageField(null=True)
     is_private = models.BooleanField()
