@@ -1,12 +1,31 @@
 {% extends 'mainapp/main.html' %}
 {% block head %}
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
     <style>
-    h1 {
-        color: #761c19;
-    }
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
     </style>
 {% endblock %}
 
 {% block content %}
-    <h1> MAP </h1>
+    <div id="map"></div>
+    <script>
+      var map;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: -34.397, lng: 150.644},
+          zoom: 8
+        });
+      }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIdZNGch6Ewi6hyHxO0aSA_FQNFU0y-M0&callback=initMap"
+    async defer></script>
 {% endblock %}
