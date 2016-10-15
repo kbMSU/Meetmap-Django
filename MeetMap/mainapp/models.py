@@ -11,10 +11,10 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     display_picture = models.ImageField()
     description = models.CharField(max_length=500)
-    interests = models.ManyToManyField(Interest)
-    whitelist = models.ManyToManyField('self')
-    blacklist = models.ManyToManyField('self')
-    events = models.ManyToManyField('Event')
+    interests = models.ManyToManyField(Interest, blank=True)
+    whitelist = models.ManyToManyField('self', blank=True)
+    blacklist = models.ManyToManyField('self', blank=True)
+    events = models.ManyToManyField('Event', blank=True)
 
     def __str__(self):
         return self.user.username
