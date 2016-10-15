@@ -1,10 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.template import loader
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from mainapp.models import UserProfile, Event
+from mainapp.models import UserProfile, Event, Interest
 from django.core import serializers
 
 from .forms import LoginForm, RegisterForm
@@ -243,11 +243,30 @@ def profile(request):
     return render(request,'mainapp/profile.html')
 
 def map(request):
+    if request.user.is_authenticated():
 
-    events = serializers.serialize("json", Event.objects.all(),
-                                   use_natural_foreign_keys=True, use_natural_primary_keys=True)
-    print(events)
-    return render(request,'mainapp/map.html', {'events': events})
+        current_user = UserProfile.objects.filter(user=request.user)
+        #print("User: " + str(current_user.values()[0]))
+        interests = Interest.objects.filter(userprofile=current_user)
+        #print("Interests: " + str(interests.values()[0]))
+
+        if interests: #if the user has interests, only render map with events of that interest
+            interestArray = []
+            for interest in interests:
+                interestArray += [interest.id]
+            #print("InterestArray: " + str(interestArray))
+
+            events = serializers.serialize("json", Event.objects.filter(interests__in=interestArray),
+                                           use_natural_foreign_keys=True, use_natural_primary_keys=True)
+            print(events)
+            return render(request, 'mainapp/map.html', {'events': events})
+        else: # if the user has no interests, render all events
+            events = serializers.serialize("json", Event.objects.all(),
+                                           use_natural_foreign_keys=True, use_natural_primary_keys=True)
+            return render(request, 'mainapp/map.html', {'events': events})
+
+    else:
+        return redirect('/../mainapp/login.html')
 
 def mymeets(request):
     return render(request,'mainapp/mymeets.html')
