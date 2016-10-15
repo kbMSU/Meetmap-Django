@@ -1,10 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.template import loader
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from mainapp.models import UserProfile
+from mainapp.models import UserProfile, Event
+from django.core import serializers
 
 from .forms import LoginForm, RegisterForm
 
@@ -242,7 +243,11 @@ def profile(request):
     return render(request,'mainapp/profile.html')
 
 def map(request):
-    return render(request,'mainapp/map.html')
+
+    events = serializers.serialize("json", Event.objects.all(),
+                                   use_natural_foreign_keys=True, use_natural_primary_keys=True)
+    print(events)
+    return render(request,'mainapp/map.html', {'events': events})
 
 def mymeets(request):
     return render(request,'mainapp/mymeets.html')
