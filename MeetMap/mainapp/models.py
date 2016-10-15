@@ -19,14 +19,34 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
 
+# This class helps with serialization of foreign keys
+# Makes foreign key return values rather than an integer
+class LocationManager(models.Manager):
+    def get_by_natural_key(self, latitude, longitude, street_number, street_name, suburb,
+                           city, zipcode):
+        return self.get(latitude = latitude,
+                        longitude = longitude,
+                        street_number = street_number,
+                        street_name = street_name,
+                        suburb = suburb,
+                        city = city,
+                        zipcode = zipcode)
+
 class Location(models.Model):
+    objects = LocationManager()
+
+    latitude = models.FloatField(default=0)
+    longitude = models.FloatField(default=0)
     street_number = models.CharField(max_length=100)
     street_name = models.CharField(max_length=100)
     suburb = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     zipcode = models.IntegerField()
-    latitude = models.FloatField(default=0)
-    longitude = models.FloatField(default=0)
+
+    def natural_key(self):
+        return(self.latitude, self.longitude, self.street_number, self.street_name, self.suburb,
+               self.city, self.zipcode)
+
 
     def __str__(self):
         return self.street_number + " " + \
