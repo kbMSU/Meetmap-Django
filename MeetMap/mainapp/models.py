@@ -4,6 +4,9 @@ from django.contrib.auth.models import User
 class Interest(models.Model):
     interest_name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.interest_name
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     display_picture = models.ImageField()
