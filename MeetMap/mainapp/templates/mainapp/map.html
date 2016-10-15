@@ -53,6 +53,14 @@
         });
         var infoWindow = new google.maps.InfoWindow();
 
+        google.maps.event.addListener(map, 'click', function(event) {
+            /*
+                Insert your "Create Event" function here.
+                The code below is for testing, and to show how to get latLng
+            */
+            marker = new google.maps.Marker({position: event.latLng, map: map});
+        })
+
         function placeMarker( info ) {
             var latLng = new google.maps.LatLng( info[1], info[2] );
             var marker = new google.maps.Marker({
