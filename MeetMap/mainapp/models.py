@@ -4,6 +4,9 @@ from django.contrib.auth.models import User
 class Interest(models.Model):
     interest_name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.interest_name
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     display_picture = models.ImageField()
@@ -13,6 +16,9 @@ class UserProfile(models.Model):
     blacklist = models.ManyToManyField('self')
     events = models.ManyToManyField('Event')
 
+    def __str__(self):
+        return self.user.username
+
 class Location(models.Model):
     street_number = models.CharField(max_length=100)
     street_name = models.CharField(max_length=100)
@@ -21,6 +27,13 @@ class Location(models.Model):
     zipcode = models.IntegerField()
     latitude = models.FloatField(default=0)
     longitude = models.FloatField(default=0)
+
+    def __str__(self):
+        return self.street_number + " " + \
+               self.street_name + ", " + \
+               self.suburb + ", " + \
+               self.city + " " + \
+               str(self.zipcode)
 
 class Event(models.Model):
     name = models.CharField(max_length=100)
@@ -32,3 +45,6 @@ class Event(models.Model):
     is_private = models.BooleanField()
     interests = models.ManyToManyField(Interest)
     creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name + " | Creator: " + self.creator.user.username
