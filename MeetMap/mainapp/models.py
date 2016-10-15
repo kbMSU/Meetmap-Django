@@ -31,6 +31,7 @@ class LocationManager(models.Manager):
                         suburb = suburb,
                         city = city,
                         zipcode = zipcode)
+
 class Location(models.Model):
     objects = LocationManager()
 
