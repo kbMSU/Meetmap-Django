@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="{% static "/mainapp/jquery/jquery.js" %}"></script>
     <script src="{% static "/mainapp/bootstrap/js/bootstrap.js" %}"></script>
-    <script src="{% static "/mainapp/bootstrap/js/sidebar.js" %}"></script>
+    <script src="{% static "/mainapp/js/sidebar.js" %}"></script>
     <link href="{% static "/mainapp/css/sidebar.css" %}" rel="stylesheet">
     <title>MeetMap</title>
     {% block head %}
@@ -35,6 +35,8 @@
     {% block content %}
     {% endblock %}
   </div>
+    {% block scripts %}
+    {% endblock %}
 </body>
 
 </html>

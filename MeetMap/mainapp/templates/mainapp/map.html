@@ -1,8 +1,6 @@
 {% extends 'mainapp/main.html' %}
 {% block head %}
-    <title>Simple Map</title>
-    <meta name="viewport" content="initial-scale=1.0">
-    <meta charset="utf-8">
+    <link href="/mainapp/css/map.css" rel="stylesheet">
     <style>
       html, body {
         height: 100%;
@@ -15,16 +13,68 @@
     </style>
 {% endblock %}
 
+
 {% block content %}
     <div id="map"></div>
-    <script>
-      var map;
-      function initMap() {
-        map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
-          zoom: 8
+{% endblock %}
+
+
+{% block scripts %}
+    <script type="text/javascript">
+    var events = {{ events|safe }};
+
+    var markerInfo = [];
+    for (var i = 0; i < events.length; i++)
+    {
+        /*
+            set your modal html here as a string.
+        */
+        //              [string, lat, lng]
+        markerInfo[i] = [
+            '<div><h2>' + events[i].fields.name + '</h2>' +
+            '<h4>' +
+                events[i].fields.location[2] + ' ' +
+                events[i].fields.location[3] + ' ' +
+                events[i].fields.location[4] + ' ' +
+                events[i].fields.location[5] + ' ' +
+                events[i].fields.location[6] +
+            '</h4>' +
+            '<p>' + events[i].fields.description + '</p>' +
+            '<button type="button" class="btn btn-default pull-right">RSVP</button>' +
+            '</div>',
+            events[i].fields.location[0],
+            events[i].fields.location[1]
+        ];
+    }
+    function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: -33.864677, lng: 151.211160},
+            zoom: 15
         });
-      }
+        var infoWindow = new google.maps.InfoWindow();
+
+        function placeMarker( info ) {
+            var latLng = new google.maps.LatLng( info[1], info[2] );
+            var marker = new google.maps.Marker({
+                position : latLng,
+                map      : map
+            });
+            google.maps.event.addListener(marker, 'click', function(){
+                /*
+                    Insert your 'open modal' operation here
+                    fill the modal div with info[0][0]
+                 */
+                infoWindow.close();
+                infoWindow.setContent(info[0]);
+                infoWindow.open(map, marker);
+            });
+        }
+
+        for (var i = 0; i < events.length; i++)
+        {
+            placeMarker(markerInfo[i]);
+        }
+    }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIdZNGch6Ewi6hyHxO0aSA_FQNFU0y-M0&callback=initMap"
     async defer></script>
