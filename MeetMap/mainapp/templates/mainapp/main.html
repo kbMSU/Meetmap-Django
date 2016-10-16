@@ -1,1 +1,40 @@
-<h1>This is the main page</h1>
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="{% static "/mainapp/jquery/jquery.js" %}"></script>
+    <script src="{% static "/mainapp/bootstrap/js/bootstrap.js" %}"></script>
+    <script src="{% static "/mainapp/bootstrap/js/sidebar.js" %}"></script>
+    <link href="{% static "/mainapp/css/sidebar.css" %}" rel="stylesheet">
+    <title>MeetMap</title>
+    {% block head %}
+    {% endblock %}
+</head>
+
+<body>
+  <div class="sidebar-nav">
+    <ul class="sidebar-list">
+      <li class="sidebar-brand">
+          <h1 class="header">MeetMap</h1>
+      </li>
+      <li>
+          <a href="{% url 'mainapp:profile' %}">Profile</a>
+      </li>
+      <li>
+          <a href="{% url 'mainapp:map' %}">Map</a>
+      </li>
+      <li>
+          <a href="{% url 'mainapp:mymeets' %}">My Meets</a>
+      </li>
+    </ul>
+  </div>
+  <div class="main-content">
+    {% block content %}
+    {% endblock %}
+  </div>
+</body>
+
+</html>
