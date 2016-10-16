@@ -244,6 +244,13 @@ def profile(request):
 
 def map(request):
     if request.user.is_authenticated():
+        return render(request, 'mainapp/map.html')
+
+    else:
+        return redirect('/../mainapp/login.html')
+
+def get_events(request):
+    if request.user.is_authenticated():
 
         current_user = UserProfile.objects.filter(user=request.user)
         #print("User: " + str(current_user.values()[0]))
@@ -259,11 +266,11 @@ def map(request):
             events = serializers.serialize("json", Event.objects.filter(interests__in=interestArray),
                                            use_natural_foreign_keys=True, use_natural_primary_keys=True)
             print(events)
-            return render(request, 'mainapp/map.html', {'events': events})
+            return HttpResponse(events, content_type='application/json')
         else: # if the user has no interests, render all events
             events = serializers.serialize("json", Event.objects.all(),
                                            use_natural_foreign_keys=True, use_natural_primary_keys=True)
-            return render(request, 'mainapp/map.html', {'events': events})
+            return HttpResponse(events, content_type='application/json')
 
     else:
         return redirect('/../mainapp/login.html')
