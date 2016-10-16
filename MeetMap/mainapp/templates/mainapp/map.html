@@ -18,9 +18,17 @@
 {% endblock %}
 
 {% block dialogs %}
-  <div id="create-event" class="create-event container-fluid">
-    <form action="/create_event/" method="post" id="create-event-form">
+  <div id="create-event">
+    <form enctype="multipart/form-data" action="/create_event/" method="post"
+      id="create-event-form">
       {% csrf_token %}
+      <div id="generic-error-template">
+        <div class="alert alert-danger">
+          <div id="generic-error-text">
+            There was an error creating the event.
+          </div>
+        </div>
+      </div>
       <div class="form-group">
         <label for="id_{{ event_form.name.name }}">
           {{ event_form.name.label }}
@@ -90,7 +98,7 @@
       </div>
       <div class="form-group">
         <label for="id_{{ event_form.zipcode.name }}">
-          {{ event_form.city.label }}
+          {{ event_form.zipcode.label }}
         </label>
         <input type="number" class="form-control"
           id="id_{{ event_form.zipcode.name }}"
@@ -131,7 +139,9 @@
     </form>
   </div>
 
-  <div id="event-details" class="event-details">
-    EVENT DETAILS
+  <div id="create-event-success">
+    <div class="alert alert-success">
+      The event has been successfully created !
+    </div>
   </div>
 {% endblock %}

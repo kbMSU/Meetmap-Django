@@ -1,13 +1,22 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
+from django.http import Http404
 from django.template import loader
 from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout
 from django.contrib.auth.models import User
-from mainapp.models import UserProfile
+from mainapp.models import UserProfile, Location, Event , Interest
 
 from .forms import LoginForm, RegisterForm, CreateEventForm
 
+'''
+Purpose : This view is for logging in.
+Returns : LoginForm if the user is yet to login.
+Alternate : Redirects to Map view if the login is successfuly
+'''
 def login(request):
     loginFailed = False
     usernameMissing = False
@@ -23,6 +32,7 @@ def login(request):
             password = loginForm.cleaned_data['password']
             user = authenticate(username=username,password=password)
             if user is not None:
+                auth_login(request,user)
                 return HttpResponseRedirect('/map/')
             else:
                 loginFailed = True
@@ -44,6 +54,11 @@ def login(request):
 
     return render(request, 'mainapp/login.html', data)
 
+'''
+Purpose : This view is for signup
+Returns : Signup form
+Alternate : None
+'''
 def signup(request):
     registerSuccess = False
     registerFailed = False
@@ -70,7 +85,7 @@ def signup(request):
                         try:
                             newUser = User.objects.create_user(username, email, password1)
                             newUser.save()
-                            newUserProfile = UserProfile(user=newUser)
+                            newUserProfile = UserProfile(user=newUser,username=username)
                             newUserProfile.save()
                         except:
                             registerFailed = True
@@ -126,31 +141,65 @@ def map(request):
 def mymeets(request):
     return render(request,'mainapp/mymeets.html')
 
+'''
+Purpose : This view is for creating events with POST.
+Returns : JSON response indicating whether the save is successful or failed
+Alternate : 404 error if the user tries to reach this view with a GET
+'''
 def create_event(request):
-    success = False
-    message = "Only POST request allowed on this URL"
+    saved = False
+    message = "Error creating event"
+    errors = None
 
-    data = {
-        'success':success,
-        'message':message
-    }
-    return HttpResponse(
-        data,
-        content_type="application/json"
-    )
-
-    '''
     if request.method == 'POST':
-        success = True
-        message = "Event successfuly created !"
+        form = CreateEventForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            street_number = form.cleaned_data['street_number']
+            street_name = form.cleaned_data['street_name']
+            suburb = form.cleaned_data['suburb']
+            city = form.cleaned_data['city']
+            zipcode = form.cleaned_data['zipcode']
+
+            name = form.cleaned_data['name']
+            from_time = form.cleaned_data['from_time']
+            to_time = form.cleaned_data['to_time']
+            description = form.cleaned_data['description']
+            picture = form.cleaned_data['picture']
+            is_private = form.cleaned_data['is_private']
+            interests = form.cleaned_data['interests']
+
+            location = Location(street_number=street_number,street_name=street_name,
+                suburb=suburb,city=city,zipcode=zipcode,latitude=0,longitude=0)
+            location.save()
+
+            current_user = request.user.username
+            profile = UserProfile.objects.get(username=current_user)
+
+            meet = Event(name=name,from_time=from_time,to_time=to_time,
+                description=description,is_private=is_private,
+                location=location,creator=profile)
+            meet.save()
+            meet.interests = interests
+            meet.save()
+
+            saved = True
+            message = "Event successfuly created !"
+        else:
+            saved = False
+            message = "All fields required."
+            errors = form.errors
+    else:
+        '''
+        The user cannot visit this view from the brower. This view is only for
+        saving events with a POST request
+        '''
+        raise Http404
 
     data = {
-        'success':success,
-        'message':message
+        'saved':saved,
+        'message':message,
+        'errors':errors,
     }
 
-    return HttpResponse(
-        data,
-        content_type="application/json"
-    )
-    '''
+    return JsonResponse(data)

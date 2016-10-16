@@ -21,7 +21,7 @@ class CreateEventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        exclude = ['creator']
+        exclude = ['creator','location']
         labels = {
             'name' : 'What do you call the event ?',
             'from_time' : 'When does the event start ?',
@@ -30,4 +30,7 @@ class CreateEventForm(forms.ModelForm):
             'picture' : 'Show a picture about your event',
             'is_private' : 'Is your event private ?',
             'interests' : 'Tag your event for others to find'
+        }
+        initial = {
+            'is_private' : False
         }
