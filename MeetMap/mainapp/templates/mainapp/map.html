@@ -1,21 +1,45 @@
 {% extends 'mainapp/main.html' %}
+
+{% load static %}
+
 {% block head %}
-    <link href="/mainapp/css/map.css" rel="stylesheet">
-    <style>
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      #map {
-        height: 100%;
-      }
-    </style>
+    <link href="{% static "/mainapp/css/map.css" %}" rel="stylesheet">
 {% endblock %}
 
 
 {% block content %}
     <div id="map"></div>
+    <div class="footer">
+        <fieldset class="group">
+            <legend>My Interests</legend>
+            <ul class="checkbox">
+                <li><input type="checkbox" id = "1" value="Pokemon" checked/>
+                    <label for="1">Pokemon</label></li>
+                <li><input type="checkbox" id = "2" value="Hockey" checked/>
+                    <label for="2">Hockey</label></li>
+                <li><input type="checkbox" id = "3" value="Soccer" checked/>
+                    <label for="3">Soccer</label></li>
+                <li><input type="checkbox" id = "4" value="Juggling" checked/>
+                    <label for="4">Juggling</label></li>
+                <li><input type="checkbox" id = "5" value="Quidditch" checked/>
+                    <label for="5">Quidditch</label></li>
+                <li><input type="checkbox" id = "6" value="Funtimes" checked/>
+                    <label for="6">Funtimes</label></li>
+                <li><input type="checkbox" id = "7" value="Funtimes" checked/>
+                    <label for="7">Funtimes</label></li>
+                <li><input type="checkbox" id = "8" value="Funtimes" checked/>
+                    <label for="8">Funtimes</label></li>
+                <li><input type="checkbox" id = "9" value="Funtimes" checked/>
+                    <label for="9">Funtimes</label></li>
+                <li><input type="checkbox" id = "10" value="Funtimes" checked/>
+                    <label for="10">Funtimes</label></li>
+                <li><input type="checkbox" id = "11" value="Funtimes" checked/>
+                    <label for="11">Funtimes</label></li>
+                <li><input type="checkbox" id = "12" value="Funtimes" checked/>
+                    <label for="12">Funtimes</label></li>
+            </ul>
+            </fieldset>
+    </div>
 {% endblock %}
 
 
@@ -24,6 +48,12 @@
     var events = {{ events|safe }};
 
     var markerInfo = [];
+    var markerGroups = {
+        "1" : [],
+        "2" : [],
+        "3" : [],
+        "4" : []
+    };
     for (var i = 0; i < events.length; i++)
     {
         /*
@@ -43,7 +73,9 @@
             '<button type="button" class="btn btn-default pull-right">RSVP</button>' +
             '</div>',
             events[i].fields.location[0],
-            events[i].fields.location[1]
+            events[i].fields.location[1],
+            events[i].fields.interests.length,
+            events[i].fields.interests
         ];
     }
     function initMap() {
@@ -59,14 +91,21 @@
                 The code below is for testing, and to show how to get latLng
             */
             marker = new google.maps.Marker({position: event.latLng, map: map});
-        })
+        });
 
         function placeMarker( info ) {
             var latLng = new google.maps.LatLng( info[1], info[2] );
             var marker = new google.maps.Marker({
                 position : latLng,
-                map      : map
+                map      : map,
+                counter  : info[3]
             });
+            // put the markers in groups
+            for (var i = 0; i < info[4].length; i++)
+            {
+                markerGroups[info[4][i]].push(marker);
+            }
+
             google.maps.event.addListener(marker, 'click', function(){
                 /*
                     Insert your 'open modal' operation here
@@ -83,6 +122,34 @@
             placeMarker(markerInfo[i]);
         }
     }
+
+    // this function is triggered when a checkbox changes
+    $(":checkbox").change(function toggleGroup() {
+        var type = this.id;
+        // checked the checkbox
+        if ($('#'+type).is(':checked')) {
+            // for all markers in the checkbox's interest group
+            for (var i = 0; i < markerGroups[type].length; i++)
+            {
+                // increment counter and make visible
+                markerGroups[type][i].counter++;
+                markerGroups[type][i].setVisible(true);
+                console.log(markerGroups[type][i].position + ' | ' + markerGroups[type][i].counter);
+            }
+        }
+        // unchecked the checkbox
+        else
+        {
+            // for all markers in the checkbox's interest group
+            for (var i = 0; i < markerGroups[type].length; i++)
+            {
+                // decrement counter and if counter is zero then make invisible
+                if (--markerGroups[type][i].counter == 0)
+                    markerGroups[type][i].setVisible(false);
+                console.log(markerGroups[type][i].position + ' | ' + markerGroups[type][i].counter);
+            }
+        }
+    })
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIdZNGch6Ewi6hyHxO0aSA_FQNFU0y-M0&callback=initMap"
     async defer></script>
