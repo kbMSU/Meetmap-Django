@@ -6,6 +6,7 @@
 var events = {};
 
 var map;
+var infoWindow;
 var markerInfo = [];
 var markerGroups = {
     "1" : [],
@@ -19,7 +20,7 @@ function initMap() {
         center: {lat: -33.864677, lng: 151.211160},
         zoom: 15
     });
-    var infoWindow = new google.maps.InfoWindow();
+    infoWindow = new google.maps.InfoWindow();
 
     google.maps.event.addListener(map, 'click', function(event) {
         /*
@@ -48,6 +49,7 @@ function placeMarker( info ) {
             Insert your 'open modal' operation here
             fill the modal div with info[0][0]
          */
+        console.log("Click");
         infoWindow.close();
         infoWindow.setContent(info[0]);
         infoWindow.open(map, marker);
@@ -83,10 +85,6 @@ $(document).ready(function() {
                     events[i].fields.interests.length,
                     events[i].fields.interests
                 ];
-            }
-
-            for (var i = 0; i < events.length; i++)
-            {
                 placeMarker(markerInfo[i]);
             }
         },
