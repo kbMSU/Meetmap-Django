@@ -4,7 +4,8 @@ from django.http import HttpResponseRedirect
 from django.template import loader
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from mainapp.models import UserProfile
+from .models import UserProfile, Event, Interest
+from django.core import serializers
 
 from .forms import LoginForm, RegisterForm
 
@@ -239,7 +240,23 @@ def createprofile(request):
     return render(request,'mainapp/createProfile.html')
 
 def profile(request):
-    return render(request,'mainapp/profile.html')
+    if request.user.is_authenticated():
+
+        profile = UserProfile.objects.get(user=request.user)
+
+        events = Event.objects.get(creator=profile)
+
+        #interests = UserProfile.interests.get(user=request.user)
+
+        data = {
+            'profile':profile,
+            'events':events,
+        #    'interests':interests
+        }
+
+        return render(request, 'mainapp/profile.html', data)
+    else:
+        return HttpResponseRedirect('/login/')
 
 def map(request):
     return render(request,'mainapp/map.html')
