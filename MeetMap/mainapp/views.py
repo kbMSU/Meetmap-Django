@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from .models import UserProfile, Event, Interest
 from django.core import serializers
 
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, ProfileForm
 
 def login(request):
     # Keeps track of whether the login failed
@@ -237,24 +237,129 @@ def signup(request):
     return render(request, 'mainapp/signup.html', data)
 
 def createprofile(request):
-    return render(request,'mainapp/createProfile.html')
+    # Keeps track of whether the registration was successful
+    profileSuccess = False
+    # Keeps track of whether the register failed
+    profileFailed = False
+    # Keeps track of whether the username is missing
+    descriptionMissing = False
+    # Keeps track of whether the username already exists
+    imageMissing = False
+
+    invalidData = False
+
+    # We will be displaying a RegisterForm on this page
+    profileForm = ProfileForm()
+
+    # They can make either a POST or a GET request to this page
+    if request.method == 'POST':
+        # When the LoginForm is "submitted" by the HTML
+        # it will make a POST request back to this same page.
+        # The POST request will contain the filled out form.
+        # Here we are getting that form
+        profileForm = ProfileForm(request.POST)
+        # Django forms can check if everything is filled out
+        # is_valid() will return False if ALL fields are not filled out
+        # and none of the fields are empty spaces. Ex. "       "
+        # If you need only some of the fields filled out then this method
+        # is useless and you have to check each field manually.
+        # I show you how to do that in the else part of this if statement
+        if profileForm.is_valid():
+            # Get the username from the form
+            description = profileForm.cleaned_data['description']
+            # Get the password from the form
+            picture = profileForm.cleaned_data['display_picture']
+            # Check that the passwords match
+
+            try:
+                profile = UserProfile.objects.get(user=request.user)
+                profile.description = description
+                profile.display_picture = picture
+                profile.save()
+            except:
+                profileFailed = True
+            else:
+                profileSuccess = True
+
+                #authenticate(username=username, password=password1)
+
+        # If the form is not filled
+        # Here we will check each field to see what is missing and
+        # display the proper message
+        else:
+            # If username is missing
+            if not profileForm.data['description']:
+                # Mark username as missing
+                descriptionMissing = True
+            # If password is missing
+            if not profileForm.data['display_picture']:
+                # Mark password as missing
+                imageMissing = True
+            # Maybe neither the username or password are missing but
+            # the form is still considered invalid by Django
+            # This can happen if for example one of the fields is just an
+            # string of blank spaces. Ex. "      "
+            # So we have to account for this
+            if not imageMissing and not descriptionMissing:
+                invalidData = True
+
+    # This is the data that the HTML expects. It is just a JSON object
+    # The HTML can use any of this data
+    data = {
+        # This registerForm will either be the new one we created
+        # at the start of the function
+        # OR
+        # the form that we got from the POST request that contains
+        # the already filled out information
+        'form': profileForm,
+        # If registerSuccess is true the HTML will display an
+        # appropriate error
+        'profileSuccess': profileSuccess,
+        # If registerFailed is true the HTML will display an
+        # appropriate error
+        'profileFailed': profileFailed,
+        # If usernameMissing is true the HTML will display an
+        # appropriate error
+        'descriptionMissing': descriptionMissing,
+        # If usernameExists is true the HTML will display an
+        # appropriate error
+        'imageMissing': imageMissing,
+        # If emailMissing is true the HTML will display an
+        # appropriate error
+        'invalidData': invalidData
+    }
+
+    # The render method takes 3 parameters.
+    # The request, the HTML to render, the JSON data to use in the page
+    # The data field is optional
+    return render(request,'mainapp/createProfile.html', data)
 
 def profile(request):
     if request.user.is_authenticated():
+        return render(request, 'mainapp/profile.html', data)
+    else:
+        return HttpResponseRedirect('/login/')
 
-        profile = UserProfile.objects.get(user=request.user)
+def get_profile(request):
+    if request.user.is_authenticated():
 
-        events = Event.objects.get(creator=profile)
-
-        #interests = UserProfile.interests.get(user=request.user)
+        profile = UserProfile.objects.filter(user=request.user)
+        serialized_profile = serializers.serialize("json", profile, use_natural_foreign_keys=True, use_natural_primary_keys=True)
+        #print(profile)
+        #print(serialized_profile)
+        events = serializers.serialize("json", Event.objects.filter(creator=profile), use_natural_foreign_keys=True, use_natural_primary_keys=True)
+        #print(events)
+        profile = serialized_profile
+        #interests = UserProfile.interests.filter(user=request.user)
 
         data = {
             'profile':profile,
             'events':events,
         #    'interests':interests
         }
+        print(profile)
 
-        return render(request, 'mainapp/profile.html', data)
+        return HttpResponse(profile, content_type='application/json')
     else:
         return HttpResponseRedirect('/login/')
 

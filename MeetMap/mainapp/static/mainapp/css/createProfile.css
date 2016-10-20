@@ -1,12 +1,12 @@
 @import url("../bootstrap/css/bootstrap.min.css");
 
-.signupform {
+.profileform {
   width: 400px;
   margin: 0 auto;
   align-self: center;
 }
 
-.signupsuccess {
+.profilesuccess {
   width: 400px;
   margin: 0 auto;
   align-self: center;

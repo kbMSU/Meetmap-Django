@@ -1,3 +1,140 @@
-<h1>
-    HELLO
-</h1>
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Link the CSS and Javascript files to the HTML -->
+    <link href="{% static "/mainapp/css/createProfile.css" %}" rel="stylesheet">
+    <!-- The JQuery script MUST be declared before the Bootstrap script -->
+    <script src="{% static "/mainapp/jquery/jquery.js" %}"></script>
+    <script src="{% static "/mainapp/bootstrap/js/bootstrap.js" %}"></script>
+    <!-- This is our own Javascript file for this page. It is empty -->
+    <script src="{% static "/mainapp/js/createProfile.js" %}"></script>
+    <title>MeetMap</title>
+  </head>
+
+  <body>
+    <div class="container-fluid vertical-center">
+      {% if profileSuccess %}
+        <div class="profilesuccess">
+          <h1 class="header text-center">MeetMap</h1>
+          <h2 class="text-center">Profile Successful</h1>
+          <a href="{% url 'mainapp:map' %}" type="button" class="btn btn-link button">
+            Go home
+          </a>
+        </div>
+      {% else %}
+        <div class="profileform">
+        <!--
+          This is our form.
+          The 'action' tag indicate which page
+          to go to when the form is submitted
+          '/' means go to the first page ( which is this page itself )
+          The 'method' tag indicates whether it is a GET or a POST
+        -->
+            <form action="/createprofile/" method="post">
+              <!--
+                Django's inbuilt CSRF protection.
+                This is a MUST for every form
+              -->
+              {% csrf_token %}
+              <h1 class="header text-center">MeetMap</h1>
+              <h2 class="text-center">Update Your Profile</h2>
+              <!--
+                Display the username field and link it to the username field
+                in the form that was given to the HTML by the Python code
+              -->
+              <div class="form-group">
+                <label for="id_{{ form.description }}">{{ form.description.label }}</label>
+                <input type="description" class="form-control"
+                  id="id_{{ form.description.name }}"
+                  name="{{ form.description.name }}"
+                  value="{{ form.description.value|default_if_none:"" }}"
+                  placeholder="Description">
+              </div>
+              <!--
+                Display the password1 field and link it to the password1 field
+                in the form that was given to the HTML by the Python code
+              -->
+              <div class="form-group">
+                <label for="id_{{ form.display_picture.name }}">{{ form.display_picture.label }}</label>
+                <input type="display_picture" class="form-control"
+                  id="id_{{ form.display_picture.name }}"
+                  name="{{ form.display_picture.name }}"
+                  value="{{ form.display_picture.value|default_if_none:"" }}"
+                  placeholder="Display Picture">
+              </div>
+              <!--
+                Display the password2 field and link it to the password2 field
+                in the form that was given to the HTML by the Python code
+              -gisterFailed is true display the proper error message
+              -->
+              {% if profileFailed %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Profile Failed!</strong> Try again
+              </div>
+              {% endif %}
+              <!--
+                If usernameMissing is true display the proper error message
+              -->
+              {% if descriptionMissing %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Profile Failed!</strong> Description is required but missing
+              </div>
+              {% endif %}
+              <!--
+                If usernameExists is true display the proper error message
+              -->
+
+              {% if imageMissing %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Profile Failed!</strong> Picture is required but missing
+              </div>
+              {% endif %}
+              <!--
+                If emailMissing is true display the proper error message
+              -->
+              {% if invalidData %}
+              <div class="alert alert-danger alert-dismissable" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Dismiss">
+                  <span aria-hidden="true">
+                    &times;
+                  </span>
+                </button>
+                <strong>Invalid Data!</strong>
+                You must enter letters, numbers or special characters
+              </div>
+              {% endif %}
+              <!--
+                This button will "submit" the form. This is indicated by its
+                type="submit" attribute
+              -->
+              <br>
+              <button id="saveButton" type="submit" class="btn btn-primary button">
+                Save
+              </button>
+            </form>
+          </div>
+      {% endif %}
+
+    </div>
+  </body>
+
+</html>

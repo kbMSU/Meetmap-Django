@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^map/', views.map, name='map'),
     url(r'^mymeets/', views.mymeets, name='mymeets'),
     url(r'^', views.login, name='login'),
+    url(r'^get_profile', views.get_profile, name='get_profile'),
 ]
