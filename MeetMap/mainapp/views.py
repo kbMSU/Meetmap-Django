@@ -2,13 +2,13 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.template import loader
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
-from mainapp.models import UserProfile
+from .models import UserProfile
 
 from .forms import LoginForm, RegisterForm
 
-def login(request):
+def login_view(request):
     # Keeps track of whether the login failed
     loginFailed = False
     # Keeps track of whether the username is missing
@@ -42,6 +42,7 @@ def login(request):
             # Ask Django to see if this user exists
             # If the user exists, this method will authenticate/login the user
             user = authenticate(username=username,password=password)
+            login(request, user)
             # If the user does exist
             if user is not None:
                 # Go to the main page
