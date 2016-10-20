@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
@@ -9,6 +9,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
 from mainapp.models import UserProfile, Location, Event , Interest
+from django.core import serializers
 
 from .forms import LoginForm, RegisterForm, CreateEventForm
 
@@ -130,6 +131,9 @@ def profile(request):
     return render(request,'mainapp/profile.html')
 
 def map(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
     eventForm = CreateEventForm()
 
     data = {
@@ -137,6 +141,30 @@ def map(request):
     }
 
     return render(request,'mainapp/map.html',data)
+
+def get_events(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
+    current_user = UserProfile.objects.filter(user=request.user)
+    #print("User: " + str(current_user.values()[0]))
+    interests = Interest.objects.filter(userprofile=current_user)
+    #print("Interests: " + str(interests.values()[0]))
+
+    if interests: #if the user has interests, only render map with events of that interest
+        interestArray = []
+        for interest in interests:
+            interestArray += [interest.id]
+        #print("InterestArray: " + str(interestArray))
+
+        events = serializers.serialize("json", Event.objects.filter(interests__in=interestArray),
+                                       use_natural_foreign_keys=True, use_natural_primary_keys=True)
+        print(events)
+        return HttpResponse(events, content_type='application/json')
+    else: # if the user has no interests, render all events
+        events = serializers.serialize("json", Event.objects.all(),
+                                       use_natural_foreign_keys=True, use_natural_primary_keys=True)
+        return HttpResponse(events, content_type='application/json')
 
 def mymeets(request):
     return render(request,'mainapp/mymeets.html')
@@ -191,7 +219,7 @@ def create_event(request):
             errors = form.errors
     else:
         '''
-        The user cannot visit this view from the brower. This view is only for
+        The user cannot visit this view from the browser. This view is only for
         saving events with a POST request
         '''
         raise Http404

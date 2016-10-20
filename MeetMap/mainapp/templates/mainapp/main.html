@@ -21,6 +21,9 @@
           <h1 class="header">MeetMap</h1>
       </li>
       <li>
+          <h4 style="color: #28a4c9;">{{ user.username }}</h4>
+      </li>
+      <li>
           <a href="{% url 'mainapp:profile' %}">Profile</a>
       </li>
       <li>
@@ -35,6 +38,8 @@
     {% block content %}
     {% endblock %}
   </div>
+    {% block scripts %}
+    {% endblock %}
 </body>
 
 {% block dialogs %}
