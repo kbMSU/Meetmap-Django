@@ -1,12 +1,181 @@
 {% extends 'mainapp/main.html' %}
+<<<<<<< HEAD
+{% load static %}
+
 {% block head %}
-    <style>
-    h1 {
-        color: #761c19;
-    }
-    </style>
+  <script src="{% static "/mainapp/jqueryUI/jquery-ui.min.js" %}"></script>
+  <link href="{% static "/mainapp/jqueryUI/jquery-ui.min.css" %}" rel="stylesheet">
+
+  <!--<script src="{% static "/mainapp/js/events.js" %}"></script>-->
+  <link href="{% static "/mainapp/css/events.css" %}" rel="stylesheet">
+
+  <link href="{% static "/mainapp/css/map.css" %}" rel="stylesheet">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIdZNGch6Ewi6hyHxO0aSA_FQNFU0y-M0&callback=initMap"
+  async defer></script>
+  <script src="{% static "/mainapp/js/map.js" %}"></script>
 {% endblock %}
 
+
 {% block content %}
-    <h1> MAP </h1>
+  <div id="map"></div>
+  <div class="footer">
+      <fieldset class="group">
+          <legend>My Interests</legend>
+          <ul class="checkbox">
+              <li><input type="checkbox" id = "1" value="Pokemon" checked/>
+                  <label for="1">Pokemon</label></li>
+              <li><input type="checkbox" id = "2" value="Hockey" checked/>
+                  <label for="2">Hockey</label></li>
+              <li><input type="checkbox" id = "3" value="Soccer" checked/>
+                  <label for="3">Soccer</label></li>
+              <li><input type="checkbox" id = "4" value="Juggling" checked/>
+                  <label for="4">Juggling</label></li>
+              <li><input type="checkbox" id = "5" value="Quidditch" checked/>
+                  <label for="5">Quidditch</label></li>
+              <li><input type="checkbox" id = "6" value="Funtimes" checked/>
+                  <label for="6">Funtimes</label></li>
+              <li><input type="checkbox" id = "7" value="Funtimes" checked/>
+                  <label for="7">Funtimes</label></li>
+              <li><input type="checkbox" id = "8" value="Funtimes" checked/>
+                  <label for="8">Funtimes</label></li>
+              <li><input type="checkbox" id = "9" value="Funtimes" checked/>
+                  <label for="9">Funtimes</label></li>
+              <li><input type="checkbox" id = "10" value="Funtimes" checked/>
+                  <label for="10">Funtimes</label></li>
+              <li><input type="checkbox" id = "11" value="Funtimes" checked/>
+                  <label for="11">Funtimes</label></li>
+              <li><input type="checkbox" id = "12" value="Funtimes" checked/>
+                  <label for="12">Funtimes</label></li>
+          </ul>
+      </fieldset>
+  </div>
+{% endblock %}
+
+{% block dialogs %}
+  <div id="create-event">
+    <form enctype="multipart/form-data" action="/create_event/" method="post"
+      id="create-event-form">
+      {% csrf_token %}
+      <div id="generic-error-template">
+        <div class="alert alert-danger">
+          <div id="generic-error-text">
+            There was an error creating the event.
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.name.name }}">
+          {{ event_form.name.label }}
+        </label>
+        <input type="text" class="form-control"
+          id="id_{{ event_form.name.name }}"
+          name="{{ event_form.name.name }}"
+          value="{{ event_form.name.value|default_if_none:"" }}"
+          placeholder="Name">
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.from_time.name }}">
+          {{ event_form.from_time.label }}
+        </label>
+        <br>
+        {{ event_form.from_time }}
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.to_time.name }}">
+          {{ event_form.to_time.label }}
+        </label>
+        <br>
+        {{ event_form.to_time }}
+      </div>
+      <label for="id_{{ event_form.location.name }}">
+        {{ event_form.location.label }}
+      </label>
+      <div class="form-group">
+        <label for="id_{{ event_form.street_number.name }}">
+          {{ event_form.street_number.label }}
+        </label>
+        <input type="number" class="form-control"
+          id="id_{{ event_form.street_number.name }}"
+          name="{{ event_form.street_number.name }}"
+          value="{{ event_form.street_number.value|default_if_none:"" }}"
+          placeholder="Street Number">
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.street_name.name }}">
+          {{ event_form.street_name.label }}
+        </label>
+        <input type="text" class="form-control"
+          id="id_{{ event_form.street_name.name }}"
+          name="{{ event_form.street_name.name }}"
+          value="{{ event_form.street_name.value|default_if_none:"" }}"
+          placeholder="Street Name">
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.suburb.name }}">
+          {{ event_form.suburb.label }}
+        </label>
+        <input type="text" class="form-control"
+          id="id_{{ event_form.suburb.name }}"
+          name="{{ event_form.suburb.name }}"
+          value="{{ event_form.suburb.value|default_if_none:"" }}"
+          placeholder="Suburb">
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.city.name }}">
+          {{ event_form.city.label }}
+        </label>
+        <input type="text" class="form-control"
+          id="id_{{ event_form.city.name }}"
+          name="{{ event_form.city.name }}"
+          value="{{ event_form.city.value|default_if_none:"" }}"
+          placeholder="City">
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.zipcode.name }}">
+          {{ event_form.zipcode.label }}
+        </label>
+        <input type="number" class="form-control"
+          id="id_{{ event_form.zipcode.name }}"
+          name="{{ event_form.zipcode.name }}"
+          value="{{ event_form.zipcode.value|default_if_none:"" }}"
+          placeholder="Zipcode">
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.is_private.name }}">
+          {{ event_form.is_private.label }}
+        </label>
+        {{ event_form.is_private }}
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.picture.name }}">
+          {{ event_form.picture.label }}
+        </label>
+        <br>
+        {{ event_form.picture }}
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.interests.name }}">
+          {{ event_form.interests.label }}
+        </label>
+        <br>
+        {{ event_form.interests }}
+      </div>
+      <div class="form-group">
+        <label for="id_{{ event_form.description.name }}">
+          {{ event_form.description.label }}
+        </label>
+        <textarea type="text" class="form-control description"
+          id="id_{{ event_form.description.name }}"
+          name="{{ event_form.description.name }}"
+          value="{{ event_form.description.value|default_if_none:"" }}">
+        </textarea>
+      </div>
+    </form>
+  </div>
+
+  <div id="create-event-success">
+    <div class="alert alert-success">
+      The event has been successfully created !
+    </div>
+  </div>
 {% endblock %}
