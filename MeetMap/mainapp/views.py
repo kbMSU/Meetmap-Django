@@ -175,9 +175,13 @@ Returns : JSON response indicating whether the save is successful or failed
 Alternate : 404 error if the user tries to reach this view with a GET
 '''
 def create_event(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
     saved = False
     message = "Error creating event"
     errors = None
+    meet = None
 
     if request.method == 'POST':
         form = CreateEventForm(request.POST, request.FILES)
@@ -188,6 +192,8 @@ def create_event(request):
             suburb = form.cleaned_data['suburb']
             city = form.cleaned_data['city']
             zipcode = form.cleaned_data['zipcode']
+            latitude = form.cleaned_data['latitude']
+            longitude = form.cleaned_data['longitude']
 
             name = form.cleaned_data['name']
             from_time = form.cleaned_data['from_time']
@@ -198,7 +204,8 @@ def create_event(request):
             interests = form.cleaned_data['interests']
 
             location = Location(street_number=street_number,street_name=street_name,
-                suburb=suburb,city=city,zipcode=zipcode,latitude=0,longitude=0)
+                suburb=suburb,city=city,zipcode=zipcode,latitude=latitude,
+                longitude=longitude)
             location.save()
 
             current_user = request.user.username
@@ -228,6 +235,7 @@ def create_event(request):
         'saved':saved,
         'message':message,
         'errors':errors,
+        'event':meet
     }
 
     return JsonResponse(data)

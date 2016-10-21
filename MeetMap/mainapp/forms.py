@@ -18,6 +18,8 @@ class CreateEventForm(forms.ModelForm):
     suburb = forms.CharField(label='Suburb')
     city = forms.CharField(label='City')
     zipcode = forms.IntegerField(label='ZipCode')
+    latitude = forms.FloatField(label='Latitude')
+    longitude = forms.FloatField(label='Longitude')
 
     class Meta:
         model = Event
