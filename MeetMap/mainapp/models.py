@@ -1,13 +1,30 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+# This class helps with serialization of foreign keys
+# Makes foreign key return values rather than an Integer (Primary Key)
+class InterestManager(models.Manager):
+    def get_by_natural_key(self, interest_name):
+        return self.get(interest_name=interest_name)
+
 class Interest(models.Model):
+    objects = InterestManager()
+
     interest_name = models.CharField(max_length=100)
+
+    def natural_key(self):
+        return(self.interest_name)
 
     def __str__(self):
         return self.interest_name
 
+class UserProfileManager(models.Manager):
+    def get_by_natural_key(self, username):
+        return self.get(username=username)
+
 class UserProfile(models.Model):
+    objects = UserProfileManager()
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     username = models.CharField(max_length=100,default="")
     display_picture = models.ImageField(null=True,upload_to = 'profile_pic_folder/')
@@ -17,11 +34,12 @@ class UserProfile(models.Model):
     blacklist = models.ManyToManyField('self')
     events = models.ManyToManyField('Event')
 
+    def natural_key(self):
+        return(self.user.username)
+
     def __str__(self):
         return self.user.username
 
-# This class helps with serialization of foreign keys
-# Makes foreign key return values rather than an integer
 class LocationManager(models.Manager):
     def get_by_natural_key(self, latitude, longitude, street_number, street_name, suburb,
                            city, zipcode):

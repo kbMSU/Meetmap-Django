@@ -137,16 +137,19 @@ def map(request):
     eventForm = CreateEventForm()
 
     data = {
-        'event_form':eventForm
+        'event_form':eventForm,
     }
 
     return render(request,'mainapp/map.html',data)
+
+def mymeets(request):
+    return render(request,'mainapp/mymeets.html')
 
 def get_events(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
 
-    current_user = UserProfile.objects.filter(user=request.user)
+    current_user = UserProfile.objects.get(user=request.user)
     interests = Interest.objects.filter(userprofile=current_user)
 
     interestArray = []
@@ -157,8 +160,15 @@ def get_events(request):
                                    use_natural_foreign_keys=True, use_natural_primary_keys=True)
     return HttpResponse(events, content_type='application/json')
 
-def mymeets(request):
-    return render(request,'mainapp/mymeets.html')
+def get_username(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
+    response = {
+        'username':request.user.username
+    }
+
+    return JsonResponse(response)
 
 '''
 Purpose : This view is for creating events with POST.

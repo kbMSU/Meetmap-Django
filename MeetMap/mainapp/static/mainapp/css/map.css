@@ -9,6 +9,10 @@ html, body {
     height: 85%;
 }
 
+.marker-details {
+  overflow: scroll;
+}
+
 .footer {
     left: -200px;
     background-color: #000;

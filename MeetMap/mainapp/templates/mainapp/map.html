@@ -6,9 +6,7 @@
   <script src="{% static "/mainapp/jqueryUI/jquery-ui.min.js" %}"></script>
   <link href="{% static "/mainapp/jqueryUI/jquery-ui.min.css" %}" rel="stylesheet">
 
-  <!--<script src="{% static "/mainapp/js/events.js" %}"></script>-->
   <link href="{% static "/mainapp/css/events.css" %}" rel="stylesheet">
-
   <link href="{% static "/mainapp/css/map.css" %}" rel="stylesheet">
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCIdZNGch6Ewi6hyHxO0aSA_FQNFU0y-M0&callback=initMap"
   async defer></script>
@@ -176,6 +174,43 @@
   <div id="create-event-success">
     <div class="alert alert-success">
       The event has been successfully created !
+    </div>
+  </div>
+
+  <div id="view-event">
+    <div id="event-error-template">
+      <div class="alert alert-danger">
+        <div id="event-error-text">
+          There was an error rsvp'ing to the event.
+        </div>
+      </div>
+    </div>
+    <form id="event-details" method="post" class="text-center">
+      {% csrf_token %}
+      <h2 id="event-name">Event Name</h2>
+      <br>
+      <p id="event-description">Event descrption</p>
+      <br>
+      <h5 id="event-from-time">From time</h5>
+      <h5 id="event-to-time">To time</h5>
+      <br>
+      <h5>Location:</h5>
+      <p id="event-location">Location</p>
+      <br>
+      <h5>Interests:</h5>
+      <div id="event-interests" class="text-center">Event Interests</div>
+    </form>
+  </div>
+
+  <div id="rsvp-event-success">
+    <div class="alert alert-success">
+      The event has been successfully created !
+    </div>
+  </div>
+
+  <div id="delete-event-success">
+    <div class="alert alert-success">
+      The event has been successfully deleted !
     </div>
   </div>
 {% endblock %}
