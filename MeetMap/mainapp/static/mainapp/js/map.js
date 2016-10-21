@@ -13,6 +13,8 @@ function initMap() {
   });
   infoWindow = new google.maps.InfoWindow();
 
+  get_meets();
+
   google.maps.event.addListener(map, 'click', function(event) {
     console.log("clicked to create event");
 
@@ -43,6 +45,62 @@ function hide_error() {
 function show_create_event_success() {
   $("#create-event").dialog("close");
   $("#create-event-success").dialog("open");
+}
+
+function place_marker(meet) {
+  meets.push(meet);
+
+  latitude = meet.fields.location[0];
+  longitude = meet.fields.location[1];
+  var latLng = new google.maps.LatLng(latitude,longitude);
+  var marker = new google.maps.Marker({
+      position : latLng,
+      map      : map,
+  });
+  markers.push(marker)
+
+  google.maps.event.addListener(marker, 'click', function(){
+      console.log("Click on marker");
+      console.log(meet);
+      html = '<div><h2>' + meet.fields.name + '</h2>' +
+      '<h4>' +
+          meet.fields.location[2] + ' ' +
+          meet.fields.location[3] + ' ' +
+          meet.fields.location[4] + ' ' +
+          meet.fields.location[5] + ' ' +
+          meet.fields.location[6] +
+      '</h4>' +
+      '<p>' + meet.fields.description + '</p>' +
+      '<button type="button" class="btn btn-default pull-right">RSVP</button>' +
+      '</div>'
+      infoWindow.close();
+      infoWindow.setContent(html);
+      infoWindow.open(map, marker);
+  });
+}
+
+function get_meets() {
+  $.ajax({
+    url : "/get_events/",
+    type : "GET",
+
+    success : function(json) {
+      console.log(json);
+      events = json;
+      markers = []
+      meets = []
+
+      for (var i = 0; i < events.length; i++)
+      {
+        place_marker(events[i])
+      }
+    },
+
+    error : function(xhr,errmsg,err) {
+      console.log(errmsg);
+      console.log("error getting events");
+    }
+  });
 }
 
 $(document).ready(function() {
@@ -84,8 +142,6 @@ $(document).ready(function() {
     Actual Javascript code for the this webpage begins here
   */
   hide_error();
-
-  get_meets();
 
   $(":checkbox").change(function toggleGroup() {
     var type = this.id;
@@ -168,54 +224,4 @@ $(document).ready(function() {
       }
     });
   };
-
-  function get_meets() {
-    $.ajax({
-      url : "/get_events/",
-      type : "GET",
-
-      success : function(json) {
-        events = json;
-        markers = []
-        meets = []
-        
-        for (var i = 0; i < events.length; i++)
-        {
-          meets.push(events[i]);
-
-          latitude = events[i].fields.location[0];
-          longitude = events[i].fields.location[1];
-          var latLng = new google.maps.LatLng(latitude,longitude);
-          var marker = new google.maps.Marker({
-              position : latLng,
-              map      : map,
-          });
-          markers.push(marker)
-
-          google.maps.event.addListener(marker, 'click', function(){
-              console.log("Click on marker");
-              html = '<div><h2>' + events[i].fields.name + '</h2>' +
-              '<h4>' +
-                  events[i].fields.location[2] + ' ' +
-                  events[i].fields.location[3] + ' ' +
-                  events[i].fields.location[4] + ' ' +
-                  events[i].fields.location[5] + ' ' +
-                  events[i].fields.location[6] +
-              '</h4>' +
-              '<p>' + events[i].fields.description + '</p>' +
-              '<button type="button" class="btn btn-default pull-right">RSVP</button>' +
-              '</div>'
-              infoWindow.close();
-              infoWindow.setContent(html);
-              infoWindow.open(map, marker);
-          });
-        }
-      },
-
-      error : function(xhr,errmsg,err) {
-        console.log(errmsg);
-        console.log("error getting events");
-      }
-    });
-  }
 });
