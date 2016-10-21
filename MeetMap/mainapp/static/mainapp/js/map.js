@@ -1,15 +1,7 @@
-
-var events = {};
-
 var map;
-var infoWindow;
-var markerInfo = [];
-var markerGroups = {
-  "1" : [],
-  "2" : [],
-  "3" : [],
-  "4" : []
-};
+var meets = [];
+var markers = [];
+var interests = [];
 
 var latitude;
 var longitude;
@@ -28,31 +20,6 @@ function initMap() {
     longitude = event.latLng.lng()
 
     show_create_event_dialog();
-  });
-}
-
-function placeMarker( info ) {
-  var latLng = new google.maps.LatLng( info[1], info[2] );
-  var marker = new google.maps.Marker({
-      position : latLng,
-      map      : map,
-      counter  : info[3]
-  });
-  // put the markers in groups
-  for (var i = 0; i < info[4].length; i++)
-  {
-      markerGroups[info[4][i]].push(marker);
-  }
-
-  google.maps.event.addListener(marker, 'click', function(){
-      /*
-          Insert your 'open modal' operation here
-          fill the modal div with info[0][0]
-       */
-      console.log("Click");
-      infoWindow.close();
-      infoWindow.setContent(info[0]);
-      infoWindow.open(map, marker);
   });
 }
 
@@ -118,6 +85,8 @@ $(document).ready(function() {
   */
   hide_error();
 
+  get_meets();
+
   $(":checkbox").change(function toggleGroup() {
     var type = this.id;
     // checked the checkbox
@@ -182,9 +151,11 @@ $(document).ready(function() {
         console.log(json);
         saved = json.saved
         message = json.message
+        meet = json.meet
         if(saved) {
           hide_error();
           show_create_event_success();
+          get_meets();
         } else {
           show_error(message);
         }
@@ -198,42 +169,53 @@ $(document).ready(function() {
     });
   };
 
-  $.ajax({
+  function get_meets() {
+    $.ajax({
       url : "/get_events/",
       type : "GET",
 
       success : function(json) {
-          events = json;
-          for (var i = 0; i < events.length; i++)
-          {
-              /*
-                  set your modal html here as a string.
-              */
-              //              [string, lat, lng]
-              markerInfo[i] = [
-                  '<div><h2>' + events[i].fields.name + '</h2>' +
-                  '<h4>' +
-                      events[i].fields.location[2] + ' ' +
-                      events[i].fields.location[3] + ' ' +
-                      events[i].fields.location[4] + ' ' +
-                      events[i].fields.location[5] + ' ' +
-                      events[i].fields.location[6] +
-                  '</h4>' +
-                  '<p>' + events[i].fields.description + '</p>' +
-                  '<button type="button" class="btn btn-default pull-right">RSVP</button>' +
-                  '</div>',
-                  events[i].fields.location[0],
-                  events[i].fields.location[1],
-                  events[i].fields.interests.length,
-                  events[i].fields.interests
-              ];
-              placeMarker(markerInfo[i]);
-          }
+        events = json;
+        markers = []
+        meets = []
+        
+        for (var i = 0; i < events.length; i++)
+        {
+          meets.push(events[i]);
+
+          latitude = events[i].fields.location[0];
+          longitude = events[i].fields.location[1];
+          var latLng = new google.maps.LatLng(latitude,longitude);
+          var marker = new google.maps.Marker({
+              position : latLng,
+              map      : map,
+          });
+          markers.push(marker)
+
+          google.maps.event.addListener(marker, 'click', function(){
+              console.log("Click on marker");
+              html = '<div><h2>' + events[i].fields.name + '</h2>' +
+              '<h4>' +
+                  events[i].fields.location[2] + ' ' +
+                  events[i].fields.location[3] + ' ' +
+                  events[i].fields.location[4] + ' ' +
+                  events[i].fields.location[5] + ' ' +
+                  events[i].fields.location[6] +
+              '</h4>' +
+              '<p>' + events[i].fields.description + '</p>' +
+              '<button type="button" class="btn btn-default pull-right">RSVP</button>' +
+              '</div>'
+              infoWindow.close();
+              infoWindow.setContent(html);
+              infoWindow.open(map, marker);
+          });
+        }
       },
 
       error : function(xhr,errmsg,err) {
-          console.log(errmsg);
-          console.log("error saving event");
+        console.log(errmsg);
+        console.log("error getting events");
       }
-  });
+    });
+  }
 });

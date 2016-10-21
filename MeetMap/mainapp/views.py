@@ -147,24 +147,15 @@ def get_events(request):
         return HttpResponseRedirect('/')
 
     current_user = UserProfile.objects.filter(user=request.user)
-    #print("User: " + str(current_user.values()[0]))
     interests = Interest.objects.filter(userprofile=current_user)
-    #print("Interests: " + str(interests.values()[0]))
 
-    if interests: #if the user has interests, only render map with events of that interest
-        interestArray = []
-        for interest in interests:
-            interestArray += [interest.id]
-        #print("InterestArray: " + str(interestArray))
+    interestArray = []
+    for interest in interests:
+        interestArray += [interest.id]
 
-        events = serializers.serialize("json", Event.objects.filter(interests__in=interestArray),
-                                       use_natural_foreign_keys=True, use_natural_primary_keys=True)
-        print(events)
-        return HttpResponse(events, content_type='application/json')
-    else: # if the user has no interests, render all events
-        events = serializers.serialize("json", Event.objects.all(),
-                                       use_natural_foreign_keys=True, use_natural_primary_keys=True)
-        return HttpResponse(events, content_type='application/json')
+    events = serializers.serialize("json", Event.objects.filter(interests__in=interestArray),
+                                   use_natural_foreign_keys=True, use_natural_primary_keys=True)
+    return HttpResponse(events, content_type='application/json')
 
 def mymeets(request):
     return render(request,'mainapp/mymeets.html')
@@ -220,6 +211,9 @@ def create_event(request):
 
             saved = True
             message = "Event successfuly created !"
+
+            meet = serializers.serialize("json", [meet], use_natural_foreign_keys=True,
+                                    use_natural_primary_keys=True)
         else:
             saved = False
             message = "All fields required."
@@ -235,7 +229,7 @@ def create_event(request):
         'saved':saved,
         'message':message,
         'errors':errors,
-        'event':meet
+        'meet':meet
     }
 
     return JsonResponse(data)
