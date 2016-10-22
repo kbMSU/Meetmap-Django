@@ -160,12 +160,23 @@ def get_events(request):
                                    use_natural_foreign_keys=True, use_natural_primary_keys=True)
     return HttpResponse(events, content_type='application/json')
 
-def get_username(request):
+def get_user_details(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
 
+    current_user = UserProfile.objects.get(user=request.user)
+    events = Event.objects.filter(
+                        userprofile=current_user
+                        ).exclude(
+                        creator=current_user
+                        )
+    meets = serializers.serialize("json", events, use_natural_foreign_keys=True,
+                                    use_natural_primary_keys=True)
+    print(meets)
+
     response = {
-        'username':request.user.username
+        'username':current_user.username,
+        'events':meets
     }
 
     return JsonResponse(response)
@@ -218,6 +229,8 @@ def create_event(request):
             meet.save()
             meet.interests = interests
             meet.save()
+            profile.events.add(meet)
+            profile.save()
 
             saved = True
             message = "Event successfuly created !"

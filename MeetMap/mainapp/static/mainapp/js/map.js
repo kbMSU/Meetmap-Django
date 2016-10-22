@@ -7,6 +7,7 @@ var selected_meet;
 var latitude;
 var longitude;
 var username;
+var user_meets = [];
 var infoWindow;
 
 function initMap() {
@@ -19,8 +20,6 @@ function initMap() {
   get_meets();
 
   google.maps.event.addListener(map, 'click', function(event) {
-    console.log("clicked to create event");
-
     latitude = event.latLng.lat()
     longitude = event.latLng.lng()
 
@@ -28,14 +27,15 @@ function initMap() {
   });
 }
 
-function get_username() {
+function get_user_details() {
   $.ajax({
-    url : "/get_username/",
+    url : "/get_user_details/",
     type : "GET",
 
     success : function(json) {
-      console.log(json);
-      username = json.username
+      username = json.username;
+      meets_json = JSON.parse(json.events);
+      user_meets = meets_json;
     },
 
     error : function(xhr,errmsg,err) {
@@ -67,31 +67,33 @@ function show_create_event_success() {
 function show_event_details_dialog() {
   meet_creator = selected_meet.fields.creator;
   if(meet_creator === username) {
-    $("#view-event").dialog({
-      autoOpen: false,
-      modal: true,
-      height: 400,
-      width: 400,
-      title: "Event Details",
-      buttons: {
-        Delete : function() {
-          delete_event();
-        }
+    $("#view-event").dialog('option', 'buttons', {
+      'Delete' : function() {
+        delete_event();
       }
     });
   } else {
-    $("#view-event").dialog({
-      autoOpen: false,
-      modal: true,
-      height: 400,
-      width: 400,
-      title: "Event Details",
-      buttons: {
-        RSVP : function() {
+    new_meet = true;
+    for(var i=0;i<user_meets.length;i++) {
+      if(user_meets[i].pk===selected_meet.pk) {
+        new_meet = false;
+        break;
+      }
+    }
+
+    if(new_meet) {
+      $("#view-event").dialog('option', 'buttons', {
+        "I'm Going" : function() {
           rsvp();
         }
-      }
-    });
+      });
+    } else {
+      $("#view-event").dialog('option', 'buttons', {
+        'Not Going' : function() {
+          not_going();
+        }
+      });
+    }
   }
 
   event_name = selected_meet.fields.name;
@@ -136,6 +138,14 @@ function rsvp() {
 
 }
 
+function not_going() {
+
+}
+
+function show_not_going_success() {
+  $("#cancel-rsvp-event-success").dialog("open");
+}
+
 function show_rsvp_success() {
   $("#rsvp-event-success").dialog("open");
 }
@@ -161,13 +171,9 @@ function place_marker(meet) {
   markers.push(marker)
 
   google.maps.event.addListener(marker, 'click', function(){
-      console.log("Click on marker");
-
       this_index = markers.indexOf(marker);
       this_meet = meets[this_index];
       selected_meet = this_meet;
-      console.log(this_meet.fields.name);
-      console.log(JSON.stringify(this_meet));
 
       html = '<div class="marker-details"><h2 class="text-center">' + meet.fields.name + '</h2>' +
       '<p>' + meet.fields.description + '</p>' +
@@ -187,7 +193,6 @@ function get_meets() {
     type : "GET",
 
     success : function(json) {
-      console.log(json);
       events = json;
       markers = []
       meets = []
@@ -203,12 +208,6 @@ function get_meets() {
       console.log("error getting events");
     }
   });
-}
-
-function show_meet_details(meet) {
-  $("#event-details")
-
-  show_event_details_dialog();
 }
 
 $(document).ready(function() {
@@ -251,7 +250,7 @@ $(document).ready(function() {
   */
   hide_error();
 
-  get_username();
+  get_user_details();
 
   $(":checkbox").change(function toggleGroup() {
     var type = this.id;
@@ -300,7 +299,22 @@ $(document).ready(function() {
     title: "Success"
   });
 
+  $("#view-event").dialog({
+    autoOpen: false,
+    modal: true,
+    height: 400,
+    width: 400,
+    title: "Event Details",
+  });
+
   $('#rsvp-event-success').dialog({
+    autoOpen: false,
+    modal: true,
+    width: 400,
+    title: "Success"
+  });
+
+  $('#cancel-rsvp-event-success').dialog({
     autoOpen: false,
     modal: true,
     width: 400,
@@ -328,10 +342,10 @@ $(document).ready(function() {
       contentType: false,
 
       success : function(json) {
-        console.log(json);
         saved = json.saved
         message = json.message
         meet = json.meet
+        user_meets.push(meet)
         if(saved) {
           hide_error();
           show_create_event_success();

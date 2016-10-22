@@ -35,7 +35,7 @@ class UserProfile(models.Model):
     events = models.ManyToManyField('Event')
 
     def natural_key(self):
-        return(self.user.username)
+        return(self.username)
 
     def __str__(self):
         return self.user.username
