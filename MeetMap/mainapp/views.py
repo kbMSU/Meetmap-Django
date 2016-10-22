@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from mainapp.models import UserProfile, Location, Event , Interest
 from django.core import serializers
 
-from .forms import LoginForm, RegisterForm, CreateEventForm
+from .forms import LoginForm, RegisterForm, CreateEventForm, GoingToEventForm
 
 '''
 Purpose : This view is for logging in.
@@ -145,6 +145,10 @@ def map(request):
 def mymeets(request):
     return render(request,'mainapp/mymeets.html')
 
+'''
+REST Endpoints start here
+'''
+
 def get_events(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
@@ -253,6 +257,36 @@ def create_event(request):
         'message':message,
         'errors':errors,
         'meet':meet
+    }
+
+    return JsonResponse(data)
+
+def going_to_event(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
+    if request.method == 'GET':
+        raise Http404
+
+    success = True
+    message = 'You are now going to the event !'
+
+    try:
+        form = GoingToEventForm(request.POST)
+        form.is_valid()
+        meet_id = form.cleaned_data['event_id']
+        meet = Event.objects.get(pk=meet_id)
+
+        current_user = UserProfile.objects.get(user=request.user)
+        current_user.events.add(meet)
+        current_user.save()
+    except:
+        success = False
+        message = "Error RSVP'ing to the event"
+
+    data = {
+        'success':success,
+        'message':message
     }
 
     return JsonResponse(data)

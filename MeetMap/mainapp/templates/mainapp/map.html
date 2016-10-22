@@ -178,15 +178,16 @@
   </div>
 
   <div id="view-event">
-    <div id="event-error-template">
-      <div class="alert alert-danger">
-        <div id="event-error-text">
-          There was an error rsvp'ing to the event.
+    <form action="/going_to_event/" method="post" class="text-center"
+        id="event-details" >
+      {% csrf_token %}
+      <div id="event-error-template">
+        <div class="alert alert-danger">
+          <div id="event-error-text">
+            There was an error rsvp'ing to the event.
+          </div>
         </div>
       </div>
-    </div>
-    <form id="event-details" method="post" class="text-center">
-      {% csrf_token %}
       <h2 id="event-name">Event Name</h2>
       <br>
       <p id="event-description">Event descrption</p>

@@ -36,3 +36,6 @@ class CreateEventForm(forms.ModelForm):
         initial = {
             'is_private' : False
         }
+
+class GoingToEventForm(forms.Form):
+    event_id = forms.IntegerField()

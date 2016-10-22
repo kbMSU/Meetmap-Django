@@ -40,7 +40,7 @@ function get_user_details() {
 
     error : function(xhr,errmsg,err) {
       console.log(errmsg);
-      console.log("error getting username");
+      console.log("error getting user details");
     }
   });
 }
@@ -135,7 +135,31 @@ function hide_event_details_error() {
 }
 
 function rsvp() {
+  var formData = new FormData($('#event-details').get(0));
+  formData.append('event_id',selected_meet.pk);
+  $.ajax({
+    url : "/going_to_event/",
+    type : "POST",
+    data : {'event_id':selected_meet.pk},
 
+    success : function(json) {
+      success = json.success;
+      message = json.message;
+      if(success) {
+        hide_event_details_error();
+        show_rsvp_success();
+        user_meets.push(selected_meet);
+      } else {
+        show_event_details_error(message);
+      }
+    },
+
+    error : function(xhr,errmsg,err) {
+      show_event_details_error("Error RSVP'ing to event");
+      console.log(errmsg);
+      console.log("Error RSVP'ing to event");
+    }
+  });
 }
 
 function not_going() {
@@ -143,10 +167,12 @@ function not_going() {
 }
 
 function show_not_going_success() {
+  $("#view-event").dialog("close");
   $("#cancel-rsvp-event-success").dialog("open");
 }
 
 function show_rsvp_success() {
+  $("#view-event").dialog("close");
   $("#rsvp-event-success").dialog("open");
 }
 
@@ -155,6 +181,7 @@ function delete_event() {
 }
 
 function show_delete_success() {
+  $("#view-event").dialog("close");
   $("#delete-event-success").dialog("open");
 }
 
