@@ -39,3 +39,9 @@ class CreateEventForm(forms.ModelForm):
 
 class GoingToEventForm(forms.Form):
     event_id = forms.IntegerField()
+
+class NotGoingToEventForm(forms.Form):
+    event_id = forms.IntegerField()
+
+class DeleteEventForm(forms.Form):
+    event_id = forms.IntegerField()

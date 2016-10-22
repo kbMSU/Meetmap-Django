@@ -27,21 +27,32 @@ function initMap() {
   });
 }
 
-function get_user_details() {
-  $.ajax({
-    url : "/get_user_details/",
-    type : "GET",
+function place_marker(meet) {
+  meets.push(meet);
 
-    success : function(json) {
-      username = json.username;
-      meets_json = JSON.parse(json.events);
-      user_meets = meets_json;
-    },
+  latitude = meet.fields.location[0];
+  longitude = meet.fields.location[1];
+  var latLng = new google.maps.LatLng(latitude,longitude);
+  var marker = new google.maps.Marker({
+      position : latLng,
+      map      : map,
+  });
+  markers.push(marker)
 
-    error : function(xhr,errmsg,err) {
-      console.log(errmsg);
-      console.log("error getting user details");
-    }
+  google.maps.event.addListener(marker, 'click', function(){
+      this_index = markers.indexOf(marker);
+      this_meet = meets[this_index];
+      selected_meet = this_meet;
+
+      html = '<div class="marker-details"><h2 class="text-center">' + meet.fields.name + '</h2>' +
+      '<p>' + meet.fields.description + '</p>' +
+      '<button type="button" class="btn btn-default text-center" onClick="show_event_details_dialog()">' +
+        'View Details'+
+      '</button>' +
+      '</div>'
+      infoWindow.close();
+      infoWindow.setContent(html);
+      infoWindow.open(map, marker);
   });
 }
 
@@ -134,9 +145,40 @@ function hide_event_details_error() {
   $("#event-error-template").hide();
 }
 
+function show_not_going_success() {
+  $("#view-event").dialog("close");
+  $("#cancel-rsvp-event-success").dialog("open");
+}
+
+function show_rsvp_success() {
+  $("#view-event").dialog("close");
+  $("#rsvp-event-success").dialog("open");
+}
+
+function show_delete_success() {
+  $("#view-event").dialog("close");
+  $("#delete-event-success").dialog("open");
+}
+
+function get_user_details() {
+  $.ajax({
+    url : "/get_user_details/",
+    type : "GET",
+
+    success : function(json) {
+      username = json.username;
+      meets_json = JSON.parse(json.events);
+      user_meets = meets_json;
+    },
+
+    error : function(xhr,errmsg,err) {
+      console.log(errmsg);
+      console.log("error getting user details");
+    }
+  });
+}
+
 function rsvp() {
-  var formData = new FormData($('#event-details').get(0));
-  formData.append('event_id',selected_meet.pk);
   $.ajax({
     url : "/going_to_event/",
     type : "POST",
@@ -149,6 +191,8 @@ function rsvp() {
         hide_event_details_error();
         show_rsvp_success();
         user_meets.push(selected_meet);
+
+        console.log("successfully rsvp'd to event");
       } else {
         show_event_details_error(message);
       }
@@ -163,54 +207,105 @@ function rsvp() {
 }
 
 function not_going() {
+  $.ajax({
+    url : "/not_going_to_event/",
+    type : "POST",
+    data : {'event_id':selected_meet.pk},
 
-}
+    success : function(json) {
+      success = json.success;
+      message = json.message;
+      if(success) {
+        hide_event_details_error();
+        show_not_going_success();
 
-function show_not_going_success() {
-  $("#view-event").dialog("close");
-  $("#cancel-rsvp-event-success").dialog("open");
-}
+        console.log("Showed leave message");
 
-function show_rsvp_success() {
-  $("#view-event").dialog("close");
-  $("#rsvp-event-success").dialog("open");
+        index = -1;
+        for(var i=0;i<user_meets.length;i++) {
+          if(user_meets[i].pk===selected_meet.pk) {
+            index = i;
+            break;
+          }
+        }
+        if(index != -1) {
+          user_meets.splice(index,1);
+        }
+
+        console.log("Spliced the user_meets");
+      } else {
+        show_event_details_error(message);
+      }
+    },
+
+    error : function(xhr,errmsg,err) {
+      show_event_details_error("Error leaving the event");
+      console.log(errmsg);
+      console.log("Error leaving the event");
+    }
+  });
 }
 
 function delete_event() {
+  $.ajax({
+    url : "/delete_event/",
+    type : "POST",
+    data : {'event_id':selected_meet.pk},
 
-}
+    success : function(json) {
+      success = json.success;
+      message = json.message;
+      if(success) {
+        hide_event_details_error();
+        show_delete_success();
 
-function show_delete_success() {
-  $("#view-event").dialog("close");
-  $("#delete-event-success").dialog("open");
-}
+        console.log("showed the delete messages");
 
-function place_marker(meet) {
-  meets.push(meet);
+        // Remove from the user_meets array
+        index = -1;
+        for(var i=0;i<user_meets.length;i++) {
+          if(user_meets[i].pk===selected_meet.pk) {
+            index = i;
+            break;
+          }
+        }
+        if(index != -1) {
+          user_meets.splice(index,1);
+        }
 
-  latitude = meet.fields.location[0];
-  longitude = meet.fields.location[1];
-  var latLng = new google.maps.LatLng(latitude,longitude);
-  var marker = new google.maps.Marker({
-      position : latLng,
-      map      : map,
-  });
-  markers.push(marker)
+        console.log("spliced the user_meets");
 
-  google.maps.event.addListener(marker, 'click', function(){
-      this_index = markers.indexOf(marker);
-      this_meet = meets[this_index];
-      selected_meet = this_meet;
+        // Remove from the meets array
+        index = -1;
+        for(var i=0;i<meets.length;i++) {
+          if(meets[i].pk===selected_meet.pk) {
+            index = i;
+            break;
+          }
+        }
+        if(index != -1) {
+          meets.splice(index,1);
+          marker = markers[index];
+          console.log(marker);
+          marker.setMap(null);
+          console.log(marker);
+          markers.splice(index,1);
+        }
 
-      html = '<div class="marker-details"><h2 class="text-center">' + meet.fields.name + '</h2>' +
-      '<p>' + meet.fields.description + '</p>' +
-      '<button type="button" class="btn btn-default text-center" onClick="show_event_details_dialog()">' +
-        'View Details'+
-      '</button>' +
-      '</div>'
-      infoWindow.close();
-      infoWindow.setContent(html);
-      infoWindow.open(map, marker);
+        console.log("spliced the meets");
+
+        selected_meet = null;
+
+      } else {
+        show_event_details_error(message);
+      }
+    },
+
+    error : function(xhr,errmsg,err) {
+      show_event_details_error("Error deleting the event");
+      console.log(errmsg);
+      console.log("Error deleting the event");
+    }
   });
 }
 

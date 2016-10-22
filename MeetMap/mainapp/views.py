@@ -12,6 +12,7 @@ from mainapp.models import UserProfile, Location, Event , Interest
 from django.core import serializers
 
 from .forms import LoginForm, RegisterForm, CreateEventForm, GoingToEventForm
+from .forms import NotGoingToEventForm, DeleteEventForm
 
 '''
 Purpose : This view is for logging in.
@@ -283,6 +284,63 @@ def going_to_event(request):
     except:
         success = False
         message = "Error RSVP'ing to the event"
+
+    data = {
+        'success':success,
+        'message':message
+    }
+
+    return JsonResponse(data)
+
+def not_going_to_event(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
+    if request.method == 'GET':
+        raise Http404
+
+    success = True
+    message = 'You are no longer going to the event !'
+
+    try:
+        form = NotGoingToEventForm(request.POST)
+        form.is_valid()
+        meet_id = form.cleaned_data['event_id']
+        meet = Event.objects.get(pk=meet_id)
+
+        current_user = UserProfile.objects.get(user=request.user)
+        current_user.events.remove(meet)
+        current_user.save()
+    except:
+        success = False
+        message = "Error leaving the event"
+
+    data = {
+        'success':success,
+        'message':message
+    }
+
+    return JsonResponse(data)
+
+def delete_event(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
+    if request.method == 'GET':
+        raise Http404
+
+    success = True
+    message = 'The event has been deleted !'
+
+    try:
+        form = NotGoingToEventForm(request.POST)
+        form.is_valid()
+        meet_id = form.cleaned_data['event_id']
+        meet = Event.objects.get(pk=meet_id)
+        meet.delete()
+    except:
+        success = False
+        message = "Error deleting the event"
 
     data = {
         'success':success,

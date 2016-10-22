@@ -14,5 +14,7 @@ urlpatterns = [
     url(r'^create_event/', views.create_event, name='createevent'),
     url(r'^get_user_details/', views.get_user_details, name='getuserdetails'),
     url(r'^going_to_event/', views.going_to_event, name='goingtoevent'),
+    url(r'^not_going_to_event/', views.not_going_to_event, name='notgoingtoevent'),
+    url(r'^delete_event/', views.delete_event, name='deleteevent'),
     url(r'^', views.login, name='login'),
 ]
