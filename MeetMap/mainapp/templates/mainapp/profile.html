@@ -1,5 +1,22 @@
 {% extends 'mainapp/main.html' %}
 
-{% block content %}
-<h1> PROFILE </h1>
+{% load static %}
+
+{% block head %}
+    <script src="{% static '/mainapp/js/profile.js' %} "></script>
+{% endblock %}
+
+{% block content%}
+    <div id="blah">
+
+    </div>
+
+<a href="{% url 'mainapp:createprofile' %}"class="button">
+                                <center>
+                                <br>
+                                <button id="saveButton" type="submit" class="btn btn-primary button">
+                                Edit Profile
+                                </button>
+
+
 {% endblock %}

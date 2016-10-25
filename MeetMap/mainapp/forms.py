@@ -1,6 +1,9 @@
 from django import forms
 from django.forms import ModelForm
-from mainapp.models import Event
+from .models import Event
+
+from .models import UserProfile
+
 
 class LoginForm(forms.Form):
     username = forms.CharField(label='Enter Username: ')
@@ -45,3 +48,10 @@ class NotGoingToEventForm(forms.Form):
 
 class DeleteEventForm(forms.Form):
     event_id = forms.IntegerField()
+
+    email = forms.CharField(label = 'Enter your email address: ')
+
+class ProfileForm(forms.Form):
+   description = forms.CharField(label='Write a description about yourself!', required=False)
+   display_picture = forms.ImageField(label='Upload a picture!', required=False)
+

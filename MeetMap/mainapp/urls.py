@@ -16,5 +16,7 @@ urlpatterns = [
     url(r'^going_to_event/', views.going_to_event, name='goingtoevent'),
     url(r'^not_going_to_event/', views.not_going_to_event, name='notgoingtoevent'),
     url(r'^delete_event/', views.delete_event, name='deleteevent'),
+
+    url(r'^get_profile/', views.get_profile, name='get_profile'),
     url(r'^', views.login, name='login'),
 ]
