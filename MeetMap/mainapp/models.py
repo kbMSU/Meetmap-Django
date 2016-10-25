@@ -1,11 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+class InterestManager(models.Manager):
+    def get_by_natural_key(self, interest_name):
+        return self.get(interest_name=interest_name)
+
+
 class Interest(models.Model):
+    objects = InterestManager()
+
     interest_name = models.CharField(max_length=100)
+
+    def natural_key(self):
+        return self.interest_name
 
     def __str__(self):
         return self.interest_name
+
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -18,6 +30,7 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
 
 class Location(models.Model):
     street_number = models.CharField(max_length=100)
@@ -35,7 +48,13 @@ class Location(models.Model):
                self.city + " " + \
                str(self.zipcode)
 
+class EventManager(models.Manager):
+    def get_by_natural_key(self, interest_name):
+        return self.get(interest_name=interest_name)
+
 class Event(models.Model):
+    objects = EventManager()
+
     name = models.CharField(max_length=100)
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     time = models.DateTimeField()
@@ -45,6 +64,9 @@ class Event(models.Model):
     is_private = models.BooleanField()
     interests = models.ManyToManyField(Interest)
     creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
+    def natural_key(self):
+        return self.name
 
     def __str__(self):
         return self.name + " | Creator: " + self.creator.user.username

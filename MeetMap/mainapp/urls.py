@@ -10,6 +10,6 @@ urlpatterns = [
     url(r'^profile/', views.profile, name='profile'),
     url(r'^map/', views.map, name='map'),
     url(r'^mymeets/', views.mymeets, name='mymeets'),
+    url(r'^get_profile/', views.get_profile, name='get_profile'),
     url(r'^', views.login, name='login'),
-    url(r'^get_profile', views.get_profile, name='get_profile'),
 ]

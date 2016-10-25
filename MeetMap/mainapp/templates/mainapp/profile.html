@@ -1,61 +1,22 @@
 {% extends 'mainapp/main.html' %}
+
 {% load static %}
 
-(% block head %}
-    <script src=" {% static "/mainapp/js/profile.js" %} "></script>
+{% block head %}
+    <script src="{% static '/mainapp/js/profile.js' %} "></script>
+{% endblock %}
 
 {% block content%}
+    <div id="blah">
 
-    <div
+    </div>
 
-<div class="container">
-    <div class="span3 well">
-        <center>
-        <a href="#aboutModal" data-toggle="modal" data-target="#myModal"><img src="<img src="{{profile.fields.display_picture}}" name="aboutme" alt= "Add a picture!" width="140" height="140" class="img-circle"></a>
-        <h3>{{ user.username }}</h3>
-        <em>Click my picture for more!</em>
-		</center>
-    </div>
-    <div>
-        <center>
-            <a href="{% url 'mainapp:createprofile' %}" type="button" class="btn btn-link button">
-                Edit Profile
-            </a>
-        </center>
-    </div>
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-                    <h4 class="modal-title" id="myModalLabel">More About {{user.username}}</h4>
-                    </div>
-                <div class="modal-body">
-                    <center>
-                    <img src="https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRbezqZpEuwGSvitKy3wrwnth5kysKdRqBW54cAszm_wiutku3R" name="aboutme" width="140" height="140" border="0" class="img-circle"></a>
-                    <h3 class="media-heading"> {{user.username}} </h3>
-                    <span><strong>Interests: </strong></span>
-                        {{profile.fields.interests}}
-                        <br>
-                        <span><strong>Events: </strong></span>
-                        {{events.fields.name}}
-                    </center>
-                    <hr>
-                    <center>
-                    <p class="text-left"><strong>Bio: </strong><br>
-                        {{profile.fields.description}}</p>
-                    <br>
-                    </center>
-                </div>
-                <div class="modal-footer">
-                    <center>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close Profile</button>
-                    </center>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<a href="{% url 'mainapp:createprofile' %}"class="button">
+                                <center>
+                                <br>
+                                <button id="saveButton" type="submit" class="btn btn-primary button">
+                                Edit Profile
+                                </button>
+
 
 {% endblock %}

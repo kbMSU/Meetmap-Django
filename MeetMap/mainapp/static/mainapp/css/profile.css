@@ -2,3 +2,24 @@
 
 .table
 
+body{padding-top:30px;}
+
+.card {
+    -moz-box-shadow: 0 0 2px #888;
+    -webkit-box-shadow: 0 0 2px#888;
+    box-shadow: 0 0 2px #888;
+}
+
+.card img {
+    width: 80px;
+    height: 80px;
+    margin-top:30px;
+}
+
+.card li a{
+
+}
+
+.nav-tabs>li>a {
+    border: none;
+}

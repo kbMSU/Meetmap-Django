@@ -11,8 +11,6 @@ class RegisterForm(forms.Form):
     password2 = forms.CharField(label='Confirm Password: ')
     email = forms.CharField(label = 'Enter your email address: ')
 
-class ProfileForm(forms.ModelForm):
-
-    class Meta:
-        model = UserProfile
-        fields = ('description', 'display_picture',)
+class ProfileForm(forms.Form):
+   description = forms.CharField(label='Write a description about yourself!', required=False)
+   display_picture = forms.ImageField(label='Upload a picture!', required=False)

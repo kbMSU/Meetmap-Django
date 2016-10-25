@@ -273,9 +273,12 @@ def createprofile(request):
 
             try:
                 profile = UserProfile.objects.get(user=request.user)
-                profile.description = description
-                profile.display_picture = picture
-                profile.save()
+                if profileForm.data['description']:
+                    profile.description = description
+                    profile.save()
+                if profileForm.data['display_picture']:
+                    profile.display_picture = picture
+                    profile.save()
             except:
                 profileFailed = True
             else:
@@ -332,34 +335,25 @@ def createprofile(request):
     # The render method takes 3 parameters.
     # The request, the HTML to render, the JSON data to use in the page
     # The data field is optional
-    return render(request,'mainapp/createProfile.html', data)
+    return render(request, 'mainapp/createProfile.html', data)
 
 def profile(request):
     if request.user.is_authenticated():
-        return render(request, 'mainapp/profile.html', data)
+        print("also here")
+        return render(request, 'mainapp/profile.html')
     else:
         return HttpResponseRedirect('/login/')
 
 def get_profile(request):
+    print("here")
     if request.user.is_authenticated():
-
-        profile = UserProfile.objects.filter(user=request.user)
-        serialized_profile = serializers.serialize("json", profile, use_natural_foreign_keys=True, use_natural_primary_keys=True)
-        #print(profile)
+        print("whatduotpfsjfsjdlkjfdsa")
+        my_profile = serializers.serialize("json", UserProfile.objects.filter(user=request.user),
+                                                   use_natural_foreign_keys=True, use_natural_primary_keys=True)
+        #print(my_profile)
         #print(serialized_profile)
-        events = serializers.serialize("json", Event.objects.filter(creator=profile), use_natural_foreign_keys=True, use_natural_primary_keys=True)
-        #print(events)
-        profile = serialized_profile
-        #interests = UserProfile.interests.filter(user=request.user)
 
-        data = {
-            'profile':profile,
-            'events':events,
-        #    'interests':interests
-        }
-        print(profile)
-
-        return HttpResponse(profile, content_type='application/json')
+        return HttpResponse(my_profile, content_type='application/json')
     else:
         return HttpResponseRedirect('/login/')
 

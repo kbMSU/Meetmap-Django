@@ -1,4 +1,6 @@
+
 {% load static %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +22,11 @@
       {% if profileSuccess %}
         <div class="profilesuccess">
           <h1 class="header text-center">MeetMap</h1>
-          <h2 class="text-center">Profile Successful</h1>
+          <h2 class="text-center">Profile Update Successful</h1>
+          <a href="{% url 'mainapp:profile' %}" type="button" class="btn btn-link button">
+            View Profile
+          </a>
+            <br>
           <a href="{% url 'mainapp:map' %}" type="button" class="btn btn-link button">
             Go home
           </a>
@@ -60,11 +66,8 @@
               -->
               <div class="form-group">
                 <label for="id_{{ form.display_picture.name }}">{{ form.display_picture.label }}</label>
-                <input type="display_picture" class="form-control"
-                  id="id_{{ form.display_picture.name }}"
-                  name="{{ form.display_picture.name }}"
-                  value="{{ form.display_picture.value|default_if_none:"" }}"
-                  placeholder="Display Picture">
+                <br>
+                {{form.display_picture}}
               </div>
               <!--
                 Display the password2 field and link it to the password2 field
@@ -78,7 +81,7 @@
                     &times;
                   </span>
                 </button>
-                <strong>Profile Failed!</strong> Try again
+                <strong>Profile Update Failed!</strong> Try again
               </div>
               {% endif %}
               <!--
@@ -91,7 +94,7 @@
                     &times;
                   </span>
                 </button>
-                <strong>Profile Failed!</strong> Description is required but missing
+                <strong>Profile Update Failed!</strong> Description is required but missing
               </div>
               {% endif %}
               <!--
@@ -105,7 +108,7 @@
                     &times;
                   </span>
                 </button>
-                <strong>Profile Failed!</strong> Picture is required but missing
+                <strong>Profile Update Failed!</strong> Picture is required but missing
               </div>
               {% endif %}
               <!--
