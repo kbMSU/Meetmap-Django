@@ -1,7 +1,8 @@
 from django import forms
 from django.forms import ModelForm
-from .models import Event
+from django.contrib.postgres.forms import SimpleArrayField
 
+from .models import Event
 from .models import UserProfile
 
 
@@ -49,9 +50,9 @@ class NotGoingToEventForm(forms.Form):
 class DeleteEventForm(forms.Form):
     event_id = forms.IntegerField()
 
-    email = forms.CharField(label = 'Enter your email address: ')
+class GetEventsForm(forms.Form):
+    interests = SimpleArrayField(forms.CharField())
 
 class ProfileForm(forms.Form):
    description = forms.CharField(label='Write a description about yourself!', required=False)
    display_picture = forms.ImageField(label='Upload a picture!', required=False)
-

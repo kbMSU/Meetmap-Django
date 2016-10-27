@@ -2,6 +2,7 @@ var map;
 var meets = [];
 var markers = [];
 var interests = [];
+var selected_interests = [];
 var selected_meet;
 
 var latitude;
@@ -61,6 +62,60 @@ function place_marker(meet) {
       infoWindow.close();
       infoWindow.setContent(html);
       infoWindow.open(map, marker);
+  });
+}
+
+/*
+  Set the interests in the footer
+*/
+function set_interests() {
+  html = "<ul class='checkbox'>";
+  for(var i=0; i<interests.length; i++) {
+    name = interests[i].fields.interest_name;
+    checked = false;
+    for(var j=0; j<user_interests.length; j++) {
+      user_interest_name = user_interests[j].fields.interest_name;
+      if(name===user_interest_name) {
+        selected_interests.push(name);
+        checked = true;
+        break;
+      }
+    }
+    html += "<li>";
+    if(checked) {
+      html += "<input type='checkbox' id="+name+" value="+name+" checked/>"+
+              "<label for="+i+">"+name+"</label>";
+    } else {
+      html += "<input type='checkbox' id="+name+" value="+name+"/>"+
+              "<label for="+i+">"+name+"</label>";
+    }
+    html += "</li>";
+  }
+  html += "</ul>";
+  $("#interests").html(html);
+  $(":checkbox").change(function toggleGroup() {
+    var type = this.id;
+    // checked the checkbox
+    if ($('#'+type).is(':checked')) {
+      console.log("checked : "+type);
+      selected_interests.push(type);
+    // unchecked the checkbox
+    } else {
+      console.log("unchecked : "+type);
+
+      // Remove the interests from the list of selected interests
+      index = -1;
+      for(var i=0;i<selected_interests.length;i++) {
+        if(type===selected_interests[i]) {
+          index = i;
+          break;
+        }
+      }
+      if(index != -1) {
+        selected_interests.splice(index,1);
+      }
+    }
+    get_meets();
   });
 }
 
@@ -193,7 +248,13 @@ function get_user_details() {
     success : function(json) {
       username = json.username;
       user_meets = JSON.parse(json.events);
+
+      // Show the list of interests
+      interests = JSON.parse(json.all_interests);
       user_interests = JSON.parse(json.interests);
+      set_interests();
+
+      // Place markers for all the events on the map
       map_events = JSON.parse(json.map_events);
       markers = [];
       meets = [];
@@ -213,14 +274,22 @@ function get_user_details() {
   Retreive all the events that match this user's interests.
 */
 function get_meets() {
+  interests_data = ''
+  for(var i=0; i<selected_interests.length; i++) {
+    interest = selected_interests[i];
+    interests_data += interest
+    if(i < selected_interests.length-1) {
+      interests_data += ', '
+    }
+  }
+  console.log(interests_data);
   $.ajax({
     url : "/get_events/",
-    type : "GET",
+    type : "POST",
+    data : {'interests':interests_data},
 
     success : function(json) {
-      console.log(json);
-      events = json;
-      console.log(events);
+      events = JSON.parse(json.events);
       markers = [];
       meets = [];
       for (var i = 0; i < events.length; i++) {
@@ -413,33 +482,6 @@ $(document).ready(function() {
   // When the page is loaded, hide the error messages until needed
   hide_error();
   hide_event_details_error();
-
-  $(":checkbox").change(function toggleGroup() {
-    var type = this.id;
-    // checked the checkbox
-    if ($('#'+type).is(':checked')) {
-        // for all markers in the checkbox's interest group
-        for (var i = 0; i < markerGroups[type].length; i++)
-        {
-            // increment counter and make visible
-            markerGroups[type][i].counter++;
-            markerGroups[type][i].setVisible(true);
-            console.log(markerGroups[type][i].position + ' | ' + markerGroups[type][i].counter);
-        }
-    }
-    // unchecked the checkbox
-    else
-    {
-        // for all markers in the checkbox's interest group
-        for (var i = 0; i < markerGroups[type].length; i++)
-        {
-            // decrement counter and if counter is zero then make invisible
-            if (--markerGroups[type][i].counter == 0)
-                markerGroups[type][i].setVisible(false);
-            console.log(markerGroups[type][i].position + ' | ' + markerGroups[type][i].counter);
-        }
-    }
-  });
 
   $("#create-event").dialog({
     autoOpen: false,

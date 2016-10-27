@@ -13,12 +13,10 @@ from .models import UserProfile, Location, Event , Interest
 from django.core import serializers
 
 from .forms import LoginForm, RegisterForm, CreateEventForm, GoingToEventForm
-from .forms import NotGoingToEventForm, DeleteEventForm
+from .forms import NotGoingToEventForm, DeleteEventForm, GetEventsForm
+from .forms import ProfileForm
 
-from .models import UserProfile, Event, Interest
 from django.core import serializers
-
-from .forms import LoginForm, RegisterForm, ProfileForm
 
 '''
 Purpose : This view is for logging in.
@@ -236,28 +234,13 @@ def mymeets(request):
 REST Endpoints start here
 '''
 
-def get_events(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/')
-
-    current_user = UserProfile.objects.get(user=request.user)
-    interests = Interest.objects.filter(userprofile=current_user)
-
-    interestArray = []
-    for interest in interests:
-        interestArray += [interest.id]
-
-    events = serializers.serialize("json", Event.objects.filter(interests__in=interestArray),
-                                   use_natural_foreign_keys=True, use_natural_primary_keys=True)
-    return HttpResponse(events, content_type='application/json')
-
 def get_user_details(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
 
     current_user = UserProfile.objects.get(user=request.user)
 
-    # Get all of the events of this user
+    # Get all of the events of this user, minus the ones they created
     events = Event.objects.filter(
                         userprofile=current_user
                         ).exclude(
@@ -271,6 +254,13 @@ def get_user_details(request):
     interests_json = serializers.serialize("json", interests,
                                             use_natural_foreign_keys=True,
                                             use_natural_primary_keys=True)
+    print(interests)
+
+    # Get ALL interests
+    all_interests = Interest.objects.all()
+    all_interests_json = serializers.serialize("json", all_interests,
+                                                use_natural_foreign_keys=True,
+                                                use_natural_primary_keys=True)
 
     # Get the events to show on the map based on the interests
     interestArray = []
@@ -281,13 +271,12 @@ def get_user_details(request):
                                             use_natural_foreign_keys=True,
                                             use_natural_primary_keys=True)
 
-    print(map_events_json)
-
     response = {
         'username':current_user.username,
         'events':events_json,
         'interests':interests_json,
-        'map_events':map_events_json
+        'map_events':map_events_json,
+        'all_interests':all_interests_json
     }
 
     return JsonResponse(response)
@@ -452,6 +441,30 @@ def delete_event(request):
     data = {
         'success':success,
         'message':message
+    }
+
+    return JsonResponse(data)
+
+def get_events(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
+    if request.method == 'GET':
+        raise Http404
+
+    form = GetEventsForm(request.POST)
+    form.is_valid()
+    selected_interests = form.cleaned_data['interests']
+    interests = Interest.objects.filter(interest_name__in=selected_interests)
+
+    events = Event.objects.filter(interests__in=interests)
+    print(events)
+    events_json = serializers.serialize("json", events,
+                                        use_natural_foreign_keys=True,
+                                        use_natural_primary_keys=True)
+
+    data = {
+        'events':events_json
     }
 
     return JsonResponse(data)
