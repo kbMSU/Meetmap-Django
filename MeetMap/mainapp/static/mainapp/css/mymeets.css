@@ -1,6 +1,12 @@
-.info-box {
-    background-color:lightblue;
-    color:black;
-    padding:20px;
-    max-width: 400px;
+.meets {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.description {
+  max-width: 400px;
+}
+
+.hidden {
+  display: none;
 }

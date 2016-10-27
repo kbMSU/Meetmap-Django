@@ -53,6 +53,10 @@ class DeleteEventForm(forms.Form):
 class GetEventsForm(forms.Form):
     interests = SimpleArrayField(forms.CharField())
 
+class MyMeetsForm(forms.Form):
+    action_type = forms.CharField()
+    event_id = forms.IntegerField()
+
 class ProfileForm(forms.Form):
    description = forms.CharField(label='Write a description about yourself!', required=False)
    display_picture = forms.ImageField(label='Upload a picture!', required=False)

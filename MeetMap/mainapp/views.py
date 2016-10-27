@@ -14,7 +14,7 @@ from django.core import serializers
 
 from .forms import LoginForm, RegisterForm, CreateEventForm, GoingToEventForm
 from .forms import NotGoingToEventForm, DeleteEventForm, GetEventsForm
-from .forms import ProfileForm
+from .forms import ProfileForm, MyMeetsForm
 
 from django.core import serializers
 
@@ -224,10 +224,40 @@ def map(request):
 
 '''
 Purpose : This view is to see their meets
-Returns :
+Returns : A list of their meets
 Alternate : Redirects to login if user is not authenticated
 '''
+def mymeets(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
 
+    current_user = UserProfile.objects.get(user=request.user)
+
+    if request.method == 'POST':
+        form = MyMeetsForm(request.POST)
+        form.is_valid()
+        action_type = form.cleaned_data['action_type']
+        meet_id = form.cleaned_data['event_id']
+        meet = Event.objects.get(pk=meet_id)
+        if action_type == "delete":
+            meet.delete()
+        else:
+            current_user.events.remove(meet)
+            current_user.save()
+
+    joined_events = Event.objects.filter(
+                                userprofile=current_user
+                                ).exclude(
+                                creator=current_user
+                                )
+    created_events = Event.objects.filter(creator=current_user)
+
+    data = {
+        'joined':joined_events,
+        'created':created_events
+    }
+
+    return render(request, 'mainapp/mymeets.html', data)
 
 '''
 REST Endpoints start here
@@ -242,8 +272,6 @@ def get_user_details(request):
     # Get all of the events of this user, minus the ones they created
     events = Event.objects.filter(
                         userprofile=current_user
-                        ).exclude(
-                        creator=current_user
                         )
     events_json = serializers.serialize("json", events, use_natural_foreign_keys=True,
                                         use_natural_primary_keys=True)
@@ -253,7 +281,6 @@ def get_user_details(request):
     interests_json = serializers.serialize("json", interests,
                                             use_natural_foreign_keys=True,
                                             use_natural_primary_keys=True)
-    print(interests)
 
     # Get ALL interests
     all_interests = Interest.objects.all()
@@ -467,12 +494,6 @@ def get_events(request):
     }
 
     return JsonResponse(data)
-
-def mymeets(request):
-    if request.user.is_authenticated():
-        return render(request, 'mainapp/mymeets.html')
-    else:
-        return HttpResponseRedirect('/login/')
 
 def get_my_events(request):
     if request.user.is_authenticated():

@@ -1,48 +1,46 @@
-/**
- * Created by Branson on 2016/10/20.
- */
-var events = {};
-var profile = {};
-//jquery
+created_meets_hidden = false;
+joined_meets_hidden = false;
+
 $( document ).ready(function() {
-    $.ajax({
-        url: "/get_my_events/",
-        type: "GET",
 
-        success : function(json) {
-            events = json;
-            console.log(events);
-            for (var i = 0; i < events.length; i++) {
-                document.getElementById('events').innerHTML +=
-                    '<div class="info-box">' +
-                        '<h2>Name:</h2><h2>' + events[i].fields.name + '</h2>' +
-                        '<h2>Time:</h2><h2>' +  events[i].fields.time + '</h2>' +
-                        '<h2>Location:</h2><h2>' + events[i].fields.location + '</h2>' +
-                    '</div>';
-            }
-        },
+  $("#created-meets").show();
+  $("#joined-meets").show();
 
-        error : function(xhr, errmsg, err) {
-            console.log(errmsg);
-            console.log("error retrieving events");
-        }
-    });
-    $.ajax({
-        url: "/get_my_profile/",
-        type: "GET",
+  $("#created-meets-button").click(function() {
+    console.log("clicked created meets button");
 
-        success : function(json) {
-            profile = json;
-            console.log(profile);
-            document.getElementById('profile').innerHTML +=
-                '<div class="profile-box">' +
-                    '<h2>Name:</h2><h2>' + profile[0].fields.user[0] + '</h2>' +
-                '</div>';
-        },
+    if(created_meets_hidden) {
+      $("#created-meets").show();
+      $("#created-meets-button").html(
+        "<h3><u>Hide meets i created</u></h3>"
+      );
+      created_meets_hidden = false;
+    } else {
+      $("#created-meets").hide();
+      $("#created-meets-button").html(
+        "<h3><u>Show meets i created</u></h3>"
+      );
+      created_meets_hidden = true;
+    }
 
-        error : function(xhr, errmsg, err) {
-            console.log(errmsg);
-            console.log("error retrieving events");
-        }
-    });
+  });
+
+  $("#joined-meets-button").click(function() {
+    console.log("clicked joined meets button");
+
+    if(joined_meets_hidden) {
+      $("#joined-meets").show();
+      $("#joined-meets-button").html(
+        "<h3><u>Hide meets i joined</u></h3>"
+      );
+      joined_meets_hidden = false;
+    } else {
+      $("#joined-meets").hide();
+      $("#joined-meets-button").html(
+        "<h3><u>Show meets i joined</u></h3>"
+      );
+      joined_meets_hidden = true;
+    }
+
+  });
 });

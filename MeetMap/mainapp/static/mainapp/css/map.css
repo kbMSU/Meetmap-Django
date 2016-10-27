@@ -14,9 +14,7 @@ html, body {
 }
 
 .footer {
-    left: -200px;
     background-color: #000;
-    position: absolute;
     height: 15%;
     width: 100%;
     margin: 0;

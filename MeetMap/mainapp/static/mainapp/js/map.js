@@ -255,12 +255,12 @@ function get_user_details() {
       set_interests();
 
       // Place markers for all the events on the map
-      map_events = JSON.parse(json.map_events);
+      /*map_events = JSON.parse(json.map_events);
       markers = [];
       meets = [];
       for (var i = 0; i < map_events.length; i++) {
         place_marker(map_events[i]);
-      }
+      }*/
     },
 
     error : function(xhr,errmsg,err) {
