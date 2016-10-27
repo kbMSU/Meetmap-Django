@@ -290,6 +290,10 @@ function get_meets() {
 
     success : function(json) {
       events = JSON.parse(json.events);
+      for(var i=0; i<markers.length; i++) {
+        marker = markers[i];
+        marker.setMap(null);
+      }
       markers = [];
       meets = [];
       for (var i = 0; i < events.length; i++) {
