@@ -1,5 +1,24 @@
+
 {% extends 'mainapp/main.html' %}
+{% load static %}
+
+{% block head %}
+    <link href="{% static "/mainapp/css/mymeets.css" %}" rel="stylesheet">
+    <script src="{% static "/mainapp/js/mymeets.js" %}"></script>
+{% endblock %}
 
 {% block content %}
 <h1> MY MEETS </h1>
+    <div id = 'events'>
+
+    </div>
+    <div class="info-box">
+        <h2>Name:</h2><h2>{{ event.fields.name }}</h2>
+        <h2>Time:</h2><h2>{{ event.fields.time }}</h2>
+        <h2>Location:</h2><h2>{{ event.fields.location }}</h2>
+    </div>
+
 {% endblock %}
+
+
+
