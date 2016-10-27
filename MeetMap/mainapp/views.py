@@ -64,8 +64,8 @@ def login(request):
 
 '''
 Purpose : This view is for signup
-Returns : Signup form
-Alternate : None
+Returns : Signup form if the user is yet to signup
+Alternate : If signup is successful then the user can redirect to create profile page
 '''
 def signup(request):
     registerSuccess = False
@@ -131,40 +131,25 @@ def signup(request):
 
     return render(request, 'mainapp/signup.html', data)
 
+'''
+Purpose : This view is to create a profile.
+Returns : A ProfileForm if they are yet to complete their profile.
+Alternate : If profile creation is successful user can redirect to map page.
+'''
 def createprofile(request):
-    # Keeps track of whether the registration was successful
     profileSuccess = False
-    # Keeps track of whether the register failed
     profileFailed = False
-    # Keeps track of whether the username is missing
     descriptionMissing = False
-    # Keeps track of whether the username already exists
     imageMissing = False
-
     invalidData = False
 
-    # We will be displaying a RegisterForm on this page
     profileForm = ProfileForm()
 
-    # They can make either a POST or a GET request to this page
     if request.method == 'POST':
-        # When the LoginForm is "submitted" by the HTML
-        # it will make a POST request back to this same page.
-        # The POST request will contain the filled out form.
-        # Here we are getting that form
         profileForm = ProfileForm(request.POST)
-        # Django forms can check if everything is filled out
-        # is_valid() will return False if ALL fields are not filled out
-        # and none of the fields are empty spaces. Ex. "       "
-        # If you need only some of the fields filled out then this method
-        # is useless and you have to check each field manually.
-        # I show you how to do that in the else part of this if statement
         if profileForm.is_valid():
-            # Get the username from the form
             description = profileForm.cleaned_data['description']
-            # Get the password from the form
             picture = profileForm.cleaned_data['display_picture']
-            # Check that the passwords match
 
             try:
                 profile = UserProfile.objects.get(user=request.user)
@@ -178,60 +163,30 @@ def createprofile(request):
                 profileFailed = True
             else:
                 profileSuccess = True
-
-                #authenticate(username=username, password=password1)
-
-        # If the form is not filled
-        # Here we will check each field to see what is missing and
-        # display the proper message
         else:
-            # If username is missing
             if not profileForm.data['description']:
-                # Mark username as missing
                 descriptionMissing = True
-            # If password is missing
             if not profileForm.data['display_picture']:
-                # Mark password as missing
                 imageMissing = True
-            # Maybe neither the username or password are missing but
-            # the form is still considered invalid by Django
-            # This can happen if for example one of the fields is just an
-            # string of blank spaces. Ex. "      "
-            # So we have to account for this
             if not imageMissing and not descriptionMissing:
                 invalidData = True
 
-    # This is the data that the HTML expects. It is just a JSON object
-    # The HTML can use any of this data
     data = {
-        # This registerForm will either be the new one we created
-        # at the start of the function
-        # OR
-        # the form that we got from the POST request that contains
-        # the already filled out information
         'form': profileForm,
-        # If registerSuccess is true the HTML will display an
-        # appropriate error
         'profileSuccess': profileSuccess,
-        # If registerFailed is true the HTML will display an
-        # appropriate error
         'profileFailed': profileFailed,
-        # If usernameMissing is true the HTML will display an
-        # appropriate error
         'descriptionMissing': descriptionMissing,
-        # If usernameExists is true the HTML will display an
-        # appropriate error
         'imageMissing': imageMissing,
-        # If emailMissing is true the HTML will display an
-        # appropriate error
         'invalidData': invalidData
     }
 
-    # The render method takes 3 parameters.
-    # The request, the HTML to render, the JSON data to use in the page
-    # The data field is optional
     return render(request, 'mainapp/createProfile.html', data)
 
+'''
+Purpose : This view is to view and update the profile
+Returns : ProfileForm
+Alternate : Redirects to login if user is not authenticated
+'''
 def profile(request):
     if request.user.is_authenticated():
         print("also here")
@@ -252,6 +207,11 @@ def get_profile(request):
     else:
         return HttpResponseRedirect('/login/')
 
+'''
+Purpose : This view is see the map
+Returns : CreateEventForm to create a new event by clicking on the map
+Alternate : Redirects to login if user is not authenticated
+'''
 def map(request):
     if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
@@ -264,6 +224,11 @@ def map(request):
 
     return render(request,'mainapp/map.html',data)
 
+'''
+Purpose : This view is to see their meets
+Returns :
+Alternate : Redirects to login if user is not authenticated
+'''
 def mymeets(request):
     return render(request,'mainapp/mymeets.html')
 
@@ -291,18 +256,38 @@ def get_user_details(request):
         return HttpResponseRedirect('/')
 
     current_user = UserProfile.objects.get(user=request.user)
+
+    # Get all of the events of this user
     events = Event.objects.filter(
                         userprofile=current_user
                         ).exclude(
                         creator=current_user
                         )
-    meets = serializers.serialize("json", events, use_natural_foreign_keys=True,
-                                    use_natural_primary_keys=True)
-    print(meets)
+    events_json = serializers.serialize("json", events, use_natural_foreign_keys=True,
+                                        use_natural_primary_keys=True)
+
+    # Get the users interests
+    interests = Interest.objects.filter(userprofile=current_user)
+    interests_json = serializers.serialize("json", interests,
+                                            use_natural_foreign_keys=True,
+                                            use_natural_primary_keys=True)
+
+    # Get the events to show on the map based on the interests
+    interestArray = []
+    for interest in interests:
+        interestArray += [interest.id]
+    map_events = Event.objects.filter(interests__in=interestArray)
+    map_events_json = serializers.serialize("json",map_events,
+                                            use_natural_foreign_keys=True,
+                                            use_natural_primary_keys=True)
+
+    print(map_events_json)
 
     response = {
         'username':current_user.username,
-        'events':meets
+        'events':events_json,
+        'interests':interests_json,
+        'map_events':map_events_json
     }
 
     return JsonResponse(response)
@@ -361,8 +346,9 @@ def create_event(request):
             saved = True
             message = "Event successfuly created !"
 
-            meet = serializers.serialize("json", [meet], use_natural_foreign_keys=True,
-                                    use_natural_primary_keys=True)
+            meet_json = serializers.serialize("json", [meet],
+                                                use_natural_foreign_keys=True,
+                                                use_natural_primary_keys=True)
         else:
             saved = False
             message = "All fields required."
@@ -378,7 +364,7 @@ def create_event(request):
         'saved':saved,
         'message':message,
         'errors':errors,
-        'meet':meet
+        'meet':meet_json
     }
 
     return JsonResponse(data)

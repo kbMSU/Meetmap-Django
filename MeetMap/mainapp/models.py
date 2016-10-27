@@ -78,13 +78,7 @@ class Location(models.Model):
                self.city + " " + \
                str(self.zipcode)
 
-class EventManager(models.Manager):
-    def get_by_natural_key(self, interest_name):
-        return self.get(interest_name=interest_name)
-
 class Event(models.Model):
-    objects = EventManager()
-
     name = models.CharField(max_length=100)
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     from_time = models.DateTimeField()
@@ -94,9 +88,6 @@ class Event(models.Model):
     is_private = models.BooleanField(default=False)
     interests = models.ManyToManyField(Interest)
     creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-
-    def natural_key(self):
-        return self.name
 
     def __str__(self):
         return self.name + " | Creator: " + self.creator.user.username

@@ -8,8 +8,13 @@ var latitude;
 var longitude;
 var username;
 var user_meets = [];
+var user_intersts = [];
 var infoWindow;
 
+/*
+ Google Maps Initialization
+ This is callback that is called asyc by the Google Maps API
+*/
 function initMap() {
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: -33.864677, lng: 151.211160},
@@ -17,7 +22,7 @@ function initMap() {
   });
   infoWindow = new google.maps.InfoWindow();
 
-  get_meets();
+  get_user_details();
 
   google.maps.event.addListener(map, 'click', function(event) {
     latitude = event.latLng.lat()
@@ -27,6 +32,9 @@ function initMap() {
   });
 }
 
+/*
+  Add the meet to the meets list and add a marker for it on the app
+*/
 function place_marker(meet) {
   meets.push(meet);
 
@@ -77,12 +85,19 @@ function show_create_event_success() {
 
 function show_event_details_dialog() {
   meet_creator = selected_meet.fields.creator;
+
+  /*
+    If the user is the creator of the meet, they can only delete it
+  */
   if(meet_creator === username) {
     $("#view-event").dialog('option', 'buttons', {
       'Delete' : function() {
         delete_event();
       }
     });
+  /*
+    If the user is not the creator, they can RSVP or un-RSVP
+  */
   } else {
     new_meet = true;
     for(var i=0;i<user_meets.length;i++) {
@@ -92,12 +107,18 @@ function show_event_details_dialog() {
       }
     }
 
+    /*
+      If the user has not already RSVP'd to the meet, they can do so now
+    */
     if(new_meet) {
       $("#view-event").dialog('option', 'buttons', {
         "I'm Going" : function() {
           rsvp();
         }
       });
+    /*
+      If the user has already RSVP'd to the meet, they can un-RSVP now
+    */
     } else {
       $("#view-event").dialog('option', 'buttons', {
         'Not Going' : function() {
@@ -133,6 +154,7 @@ function show_event_details_dialog() {
   hide_event_details_error();
   $("#view-event").dialog("open");
 
+  // When we open the event details modal, close the map marker info window.
   infoWindow.close();
 }
 
@@ -160,6 +182,9 @@ function show_delete_success() {
   $("#delete-event-success").dialog("open");
 }
 
+/*
+  We will need to retreive the user's username and meets
+*/
 function get_user_details() {
   $.ajax({
     url : "/get_user_details/",
@@ -167,8 +192,14 @@ function get_user_details() {
 
     success : function(json) {
       username = json.username;
-      meets_json = JSON.parse(json.events);
-      user_meets = meets_json;
+      user_meets = JSON.parse(json.events);
+      user_interests = JSON.parse(json.interests);
+      map_events = JSON.parse(json.map_events);
+      markers = [];
+      meets = [];
+      for (var i = 0; i < map_events.length; i++) {
+        place_marker(map_events[i]);
+      }
     },
 
     error : function(xhr,errmsg,err) {
@@ -178,6 +209,35 @@ function get_user_details() {
   });
 }
 
+/*
+  Retreive all the events that match this user's interests.
+*/
+function get_meets() {
+  $.ajax({
+    url : "/get_events/",
+    type : "GET",
+
+    success : function(json) {
+      console.log(json);
+      events = json;
+      console.log(events);
+      markers = [];
+      meets = [];
+      for (var i = 0; i < events.length; i++) {
+        place_marker(events[i]);
+      }
+    },
+
+    error : function(xhr,errmsg,err) {
+      console.log(errmsg);
+      console.log("error getting events");
+    }
+  });
+}
+
+/*
+  RSVP to the selected event.
+*/
 function rsvp() {
   $.ajax({
     url : "/going_to_event/",
@@ -190,8 +250,8 @@ function rsvp() {
       if(success) {
         hide_event_details_error();
         show_rsvp_success();
+        // Add the meet to list of meet's the user is attending
         user_meets.push(selected_meet);
-
         console.log("successfully rsvp'd to event");
       } else {
         show_event_details_error(message);
@@ -206,6 +266,9 @@ function rsvp() {
   });
 }
 
+/*
+  Take back your RSVP from an event.
+*/
 function not_going() {
   $.ajax({
     url : "/not_going_to_event/",
@@ -221,6 +284,7 @@ function not_going() {
 
         console.log("Showed leave message");
 
+        // Remove the meet from the list of meets the user is attending
         index = -1;
         for(var i=0;i<user_meets.length;i++) {
           if(user_meets[i].pk===selected_meet.pk) {
@@ -246,6 +310,9 @@ function not_going() {
   });
 }
 
+/*
+  Delete the selected event.
+*/
 function delete_event() {
   $.ajax({
     url : "/delete_event/",
@@ -261,7 +328,7 @@ function delete_event() {
 
         console.log("showed the delete messages");
 
-        // Remove from the user_meets array
+        // Remove from the list of the meets the user is attending
         index = -1;
         for(var i=0;i<user_meets.length;i++) {
           if(user_meets[i].pk===selected_meet.pk) {
@@ -275,7 +342,7 @@ function delete_event() {
 
         console.log("spliced the user_meets");
 
-        // Remove from the meets array
+        // Remove from the list of meets being displayed on the map
         index = -1;
         for(var i=0;i<meets.length;i++) {
           if(meets[i].pk===selected_meet.pk) {
@@ -286,9 +353,7 @@ function delete_event() {
         if(index != -1) {
           meets.splice(index,1);
           marker = markers[index];
-          console.log(marker);
           marker.setMap(null);
-          console.log(marker);
           markers.splice(index,1);
         }
 
@@ -305,29 +370,6 @@ function delete_event() {
       show_event_details_error("Error deleting the event");
       console.log(errmsg);
       console.log("Error deleting the event");
-    }
-  });
-}
-
-function get_meets() {
-  $.ajax({
-    url : "/get_events/",
-    type : "GET",
-
-    success : function(json) {
-      events = json;
-      markers = []
-      meets = []
-
-      for (var i = 0; i < events.length; i++)
-      {
-        place_marker(events[i])
-      }
-    },
-
-    error : function(xhr,errmsg,err) {
-      console.log(errmsg);
-      console.log("error getting events");
     }
   });
 }
@@ -366,13 +408,11 @@ $(document).ready(function() {
         }
     }
   });
+  // AJAX setup ends here ///////
 
-  /*
-    Actual Javascript code for the this webpage begins here
-  */
+  // When the page is loaded, hide the error messages until needed
   hide_error();
-
-  get_user_details();
+  hide_event_details_error();
 
   $(":checkbox").change(function toggleGroup() {
     var type = this.id;
@@ -450,6 +490,9 @@ $(document).ready(function() {
     title: "Success"
   });
 
+  /*
+    Save the event.
+  */
   function save_event() {
     console.log("saving event");
     var formData = new FormData($('#create-event-form').get(0));
@@ -464,14 +507,14 @@ $(document).ready(function() {
       contentType: false,
 
       success : function(json) {
-        saved = json.saved
-        message = json.message
-        meet = json.meet
-        user_meets.push(meet)
+        saved = json.saved;
+        message = json.message;
+        meet = json.meet;
+        user_meets.push(meet);
         if(saved) {
           hide_error();
           show_create_event_success();
-          get_meets();
+          place_marker(JSON.parse(meet)[0]);
         } else {
           show_error(message);
         }
