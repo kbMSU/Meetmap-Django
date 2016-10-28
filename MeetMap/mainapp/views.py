@@ -488,18 +488,6 @@ def get_events(request):
     else:
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
-def get_my_events(request):
-    if request.user.is_authenticated():
-        profile = UserProfile.objects.filter(user=request.user)
-        #profile_serialized = serializers.serialize("json", profile,
-        #                               use_natural_foreign_keys=True, use_natural_primary_keys=True)
-        events = serializers.serialize("json", Event.objects.filter(creator=profile),
-                                       use_natural_foreign_keys=True, use_natural_primary_keys=True)
-        #print(events)
-        return HttpResponse(events, content_type='application/json')
-    else:
-        return HttpResponseRedirect('/login/')
-
 def get_profile(request):
     print("here")
     if request.user.is_authenticated():
