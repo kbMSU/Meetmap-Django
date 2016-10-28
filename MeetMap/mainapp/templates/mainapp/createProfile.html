@@ -1,19 +1,17 @@
 
 {% load static %}
 
-
-<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Link the CSS and Javascript files to the HTML -->
-    <link href="{% static "/mainapp/css/createProfile.css" %}" rel="stylesheet">
+    <link href="{% static '/mainapp/css/createProfile.css' %}" rel="stylesheet">
     <!-- The JQuery script MUST be declared before the Bootstrap script -->
-    <script src="{% static "/mainapp/jquery/jquery.js" %}"></script>
-    <script src="{% static "/mainapp/bootstrap/js/bootstrap.js" %}"></script>
+    <script src="{% static '/mainapp/jquery/jquery.js' %}"></script>
+    <script src="{% static '/mainapp/bootstrap/js/bootstrap.js' %}"></script>
     <!-- This is our own Javascript file for this page. It is empty -->
-    <script src="{% static "/mainapp/js/createProfile.js" %}"></script>
+    <script src="{% static '/mainapp/js/createProfile.js' %}"></script>
     <title>MeetMap</title>
   </head>
 
@@ -22,7 +20,7 @@
       {% if profileSuccess %}
         <div class="profilesuccess">
           <h1 class="header text-center">MeetMap</h1>
-          <h2 class="text-center">Profile Update Successful</h1>
+          <h2 class="text-center">Profile Update Successful</h2>
           <a href="{% url 'mainapp:profile' %}" type="button" class="btn btn-link button">
             View Profile
           </a>
@@ -49,16 +47,16 @@
               <h1 class="header text-center">MeetMap</h1>
               <h2 class="text-center">Update Your Profile</h2>
               <!--
-                Display the username field and link it to the username field
+                Display the name field and link it to the name field
                 in the form that was given to the HTML by the Python code
               -->
               <div class="form-group">
-                <label for="id_{{ form.description }}{{ form.description.label }}</label>
-                <input type="description" class="form-control"
-                  id="id_{{ form.description.name }}"
-                  name="{{ form.description.name }}"
-                  value="{{ form.description.value|default_if_none:"" }}"
-                  placeholder="Description">
+                <label for="id_{{ form.name }}{{ form.name.label }}</label>
+                <input type="name" class="form-control"
+                  id="id_{{ form.name.name }}"
+                  name="{{ form.name.name }}"
+                  value="{{ form.name.value|default_if_none:"" }}"
+                  placeholder="{{ form.name.placeholder|default_if_none:"" }}">
               </div>
               <!--
                 Display the password1 field and link it to the password1 field
@@ -69,10 +67,28 @@
                 <br>
                 {{form.display_picture}}
               </div>
+
+              <div class="form-group">
+                <label for="id_{{ form.description.name }}">
+                  {{ form.description.label }}
+                </label>
+                <textarea type="text" class="form-control description"
+                  id="id_{{ form.description.name }}"
+                  name="{{ form.description.name }}"
+                  value="{{ form.description.value|default_if_none:"" }}">
+                </textarea>
+              </div>
+
+              <div class="form-group">
+                <label for="id_{{ form.interests.name }}">
+                  {{ form.interests.label }}
+                </label>
+                <br>
+                {{ form.interests }}
+              </div>
+
               <!--
-                Display the password2 field and link it to the password2 field
-                in the form that was given to the HTML by the Python code
-              -gisterFailed is true display the proper error message
+                If profileFailed is true display the proper error message
               -->
               {% if profileFailed %}
               <div class="alert alert-danger alert-dismissable" role="alert">
@@ -85,7 +101,7 @@
               </div>
               {% endif %}
               <!--
-                If usernameMissing is true display the proper error message
+                If descriptionMissing is true display the proper error message
               -->
               {% if descriptionMissing %}
               <div class="alert alert-danger alert-dismissable" role="alert">
@@ -98,7 +114,7 @@
               </div>
               {% endif %}
               <!--
-                If usernameExists is true display the proper error message
+                If imageMissing is true display the proper error message
               -->
 
               {% if imageMissing %}
@@ -112,7 +128,7 @@
               </div>
               {% endif %}
               <!--
-                If emailMissing is true display the proper error message
+                If invalidData is true display the proper error message
               -->
               {% if invalidData %}
               <div class="alert alert-danger alert-dismissable" role="alert">

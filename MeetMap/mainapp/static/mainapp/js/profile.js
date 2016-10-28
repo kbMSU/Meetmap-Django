@@ -10,22 +10,10 @@ $( document ).ready(function() {
         success: function(json) {
             profile = json[0];
             console.log(profile);
-            console.log(profile.fields.interests[0]);
             document.getElementById('desc').innerHTML +=
+                         //'<img src="'+profile.fields.display_picture+'" alt="display picture" style="width:304px;height:228px;">'
                          '<h2>' + profile.fields.username + '</h2>' +
-                         '<p><strong>About: </strong> ' + profile.fields.description + ' </p>' +
-                         '<p><strong>Whitelist: </strong>';
-            for (var i = 0; i < profile.fields.whitelist.length; i++) {
-                document.getElementById('desc').innerHTML +=
-                             '<span class="tagsW">' + profile.fields.whitelist[i] + '</span>';
-            }
-            document.getElementById('desc').innerHTML +=
-                         '</p>' +
-                         '<p><strong>Blacklist: </strong>';
-            for (var i = 0; i < profile.fields.blacklist.length; i++) {
-                document.getElementById('desc').innerHTML +=
-                             '<span class="tagsB">' + profile.fields.blacklist[i] + '</span>';
-            }
+                         '<p><strong>About: </strong> ' + profile.fields.description + ' </p>';
             document.getElementById('desc').innerHTML +=
                          '</p>' +
                          '<p><strong>Interests: </strong>';
@@ -35,6 +23,8 @@ $( document ).ready(function() {
             }
             document.getElementById('desc').innerHTML +=
                          '</p>';
+
+
         },
         error: function(xhr, errmsg, err) {
             console.log(errmsg);

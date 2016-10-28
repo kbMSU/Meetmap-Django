@@ -8,13 +8,17 @@
 {% endblock %}
 
 {% block content%}
-<div class="container">
-	<div class="row">
+<!--<div class="container">-->
+	<!--<div class="row">-->
 		 <div class="display top-margin">
              <div class="well profile">
                  <div class="col-sm-12">
                      <div id="desc" class="col-xs-12 col-sm-8">
 
+                        <!--form action="/add_interest/" method="post">
+                            {% csrf_token %}
+                            <input type="interest" class="form-control" id="id_interest" name="interest" placeholder="Add Interest"/>
+                        </form-->
                      </div>
 
                      <a href="{% url 'mainapp:createprofile' %}">
@@ -23,8 +27,8 @@
                  </div>
              </div>
 		</div>
-	</div>
-</div>
+	<!--</div>-->
+<!--</div>-->
 
 
 

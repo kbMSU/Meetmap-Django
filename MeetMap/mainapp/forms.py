@@ -2,8 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from django.contrib.postgres.forms import SimpleArrayField
 
-from .models import Event
-from .models import UserProfile
+from .models import Event, UserProfile
 
 
 class LoginForm(forms.Form):
@@ -58,5 +57,19 @@ class MyMeetsForm(forms.Form):
     event_id = forms.IntegerField()
 
 class ProfileForm(forms.Form):
-   description = forms.CharField(label='Write a description about yourself!', required=False)
-   display_picture = forms.ImageField(label='Upload a picture!', required=False)
+    name = forms.CharField(label='What is your full name?', required=False)
+    display_picture = forms.ImageField(label='Upload a picture!', required=False)
+
+    class Meta:
+        model = UserProfile
+        exclude = ['user', 'username', 'whitelist', 'blacklist', 'events']
+        labels = {
+            'description': 'Write a description about yourself!',
+            'interests ': 'What kind of meets are you interested in?',
+        }
+        initial = {
+            'is_private': False
+        }
+
+class AddInterestForm(forms.Form):
+    interest = forms.CharField()

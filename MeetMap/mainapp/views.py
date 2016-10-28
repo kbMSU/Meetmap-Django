@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from .models import UserProfile, Location, Event , Interest
 from django.core import serializers
 
-from .forms import LoginForm, RegisterForm, CreateEventForm, GoingToEventForm
+from .forms import LoginForm, RegisterForm, CreateEventForm, GoingToEventForm, AddInterestForm
 from .forms import NotGoingToEventForm, DeleteEventForm, GetEventsForm
 from .forms import ProfileForm, MyMeetsForm
 
@@ -127,7 +127,6 @@ def signup(request):
         'invalidData':invalidData
     }
 
-    return render(request, 'mainapp/signup.html', data)
 
 '''
 Purpose : This view is to create a profile.
@@ -188,6 +187,8 @@ Alternate : Redirects to login if user is not authenticated
 def profile(request):
     if request.user.is_authenticated():
         print("also here")
+        current_user = UserProfile.objects.get(user=request.user)
+        print(current_user)
         return render(request, 'mainapp/profile.html')
     else:
         return HttpResponseRedirect('/login/')
@@ -195,7 +196,6 @@ def profile(request):
 def get_profile(request):
     print("here")
     if request.user.is_authenticated():
-        print("whatduotpfsjfsjdlkjfdsa")
         my_profile = serializers.serialize("json", UserProfile.objects.filter(user=request.user),
                                                    use_natural_foreign_keys=True, use_natural_primary_keys=True)
         #print(my_profile)
@@ -204,6 +204,24 @@ def get_profile(request):
         return HttpResponse(my_profile, content_type='application/json')
     else:
         return HttpResponseRedirect('/login/')
+
+def add_interest(request):
+    print("add interest")
+
+    if request.method == 'POST':
+        form = AddInterestForm(request.POST)
+        print(form)
+        if form.is_valid():
+            interest = form.cleaned_data['interest']
+            try:
+                interestObject = Interest.objects.get(interest_name=interest)
+                # add the interest to the user profile
+                current_user = UserProfile.objects.get(user=request.user)
+                current_user.interests.add(interestObject)
+                current_user.save()
+            except Interest.DoesNotExist:
+                print ("Interest does not exist")
+        return render(request, 'mainapp/profile.html')
 
 '''
 Purpose : This view is see the map
