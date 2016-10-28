@@ -20,12 +20,14 @@ $( document ).ready(function() {
                              '<span class="tagsW">' + profile.fields.whitelist[i] + '</span>';
             }
             document.getElementById('desc').innerHTML +=
+                         '</p>' +
                          '<p><strong>Blacklist: </strong>';
             for (var i = 0; i < profile.fields.blacklist.length; i++) {
                 document.getElementById('desc').innerHTML +=
                              '<span class="tagsB">' + profile.fields.blacklist[i] + '</span>';
             }
             document.getElementById('desc').innerHTML +=
+                         '</p>' +
                          '<p><strong>Interests: </strong>';
             for (var i = 0; i < profile.fields.interests.length; i++) {
                 document.getElementById('desc').innerHTML +=

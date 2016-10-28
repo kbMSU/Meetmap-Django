@@ -53,7 +53,7 @@
                 in the form that was given to the HTML by the Python code
               -->
               <div class="form-group">
-                <label for="id_{{ form.description }}">{{ form.description.label }}</label>
+                <label for="id_{{ form.description }}{{ form.description.label }}</label>
                 <input type="description" class="form-control"
                   id="id_{{ form.description.name }}"
                   name="{{ form.description.name }}"

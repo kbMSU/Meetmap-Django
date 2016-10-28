@@ -11,12 +11,12 @@ body
 }
 
 .display {
-    width: 900px;
+    width: 500px;
     height: auto;
 }
 .profile
 {
-    min-width: 900px;
+    min-width: 500px;
     min-height: 355px;
     display: inline-block;
     }
