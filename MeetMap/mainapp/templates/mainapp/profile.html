@@ -8,28 +8,19 @@
 {% endblock %}
 
 {% block content%}
-<!--<div class="container">-->
-	<!--<div class="row">-->
-		 <div class="display top-margin">
-             <div class="well profile">
-                 <div class="col-sm-12">
-                     <div id="desc" class="col-xs-12 col-sm-8">
-
-                        <!--form action="/add_interest/" method="post">
-                            {% csrf_token %}
-                            <input type="interest" class="form-control" id="id_interest" name="interest" placeholder="Add Interest"/>
-                        </form-->
-                     </div>
-
-                     <a href="{% url 'mainapp:createprofile' %}">
-                         <button>Edit Profile</button>
-                     </a>
-                 </div>
-             </div>
-		</div>
-	<!--</div>-->
-<!--</div>-->
-
-
-
+ <div class="container display top-margin">
+     <div class="profile">
+       <h5><b>Username:</b> {{ profile.username }}</h5>
+       <h5><b>Description:</b> {{ profile.description }}</h5>
+       <h5><b>Interests:</b></h5>
+       {% for interest in interests %}
+       {{ interest }}
+       <br>
+       {% endfor %}
+       <br>
+       <a href="{% url 'mainapp:createprofile' %}">
+           <button>Edit Profile</button>
+       </a>
+     </div>
+</div>
 {% endblock %}

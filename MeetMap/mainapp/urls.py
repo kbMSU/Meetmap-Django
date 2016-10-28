@@ -17,6 +17,5 @@ urlpatterns = [
     url(r'^delete_event/', views.delete_event, name='deleteevent'),
     url(r'^mymeets/', views.mymeets, name='mymeets'),
     url(r'^get_profile/', views.get_profile, name='get_profile'),
-    url(r'^add_interest/', views.add_interest, name='add_interest'),
     url(r'^', views.login, name='login'),
 ]

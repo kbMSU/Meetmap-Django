@@ -12,9 +12,9 @@ from django.core import serializers
 
 from .models import UserProfile, Location, Event , Interest
 
-from .forms import LoginForm, RegisterForm, CreateEventForm, GoingToEventForm, AddInterestForm
+from .forms import LoginForm, RegisterForm, CreateEventForm, GoingToEventForm
 from .forms import NotGoingToEventForm, DeleteEventForm, GetEventsForm
-from .forms import ProfileForm, MyMeetsForm, CreateProfileForm
+from .forms import MyMeetsForm, CreateProfileForm
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -135,8 +135,8 @@ def signup(request):
 
 '''
 Purpose : This view is to create a profile.
-Returns : A ProfileForm if they are yet to complete their profile.
-Alternate : If profile creation is successful user can redirect to map page.
+Returns : A CreateProfileForm if they are yet to complete their profile.
+Alternate : If profile creation is successful redirects to map page.
 '''
 def createprofile(request):
     if not request.user.is_authenticated():
@@ -158,6 +158,7 @@ def createprofile(request):
                 user_profile = UserProfile.objects.get(user=request.user)
                 user_profile.description = description
                 user_profile.display_picture = picture
+                user_profile.save()
                 user_profile.interests = interests
                 user_profile.save()
 
@@ -179,16 +180,21 @@ def createprofile(request):
 '''
 Purpose : This view is to view and update the profile
 Returns : ProfileForm
-Alternate : Redirects to login if user is not authenticated
+Alternate : None
 '''
 def profile(request):
-    if request.user.is_authenticated():
-        print("also here")
-        current_user = UserProfile.objects.get(user=request.user)
-        print(current_user)
-        return render(request, 'mainapp/profile.html')
-    else:
-        return HttpResponseRedirect('/login/')
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
+
+    current_user = UserProfile.objects.get(user=request.user)
+    interests = Interest.objects.filter(userprofile=current_user)
+
+    data = {
+        'profile':current_user,
+        'interests':interests
+    }
+
+    return render(request, 'mainapp/profile.html', data)
 
 '''
 Purpose : This view is to see the map
@@ -494,21 +500,3 @@ def get_profile(request):
                                         use_natural_primary_keys=True)
 
     return Response(my_profile, status=status.HTTP_200_OK)
-
-def add_interest(request):
-    print("add interest")
-
-    if request.method == 'POST':
-        form = AddInterestForm(request.POST)
-        print(form)
-        if form.is_valid():
-            interest = form.cleaned_data['interest']
-            try:
-                interestObject = Interest.objects.get(interest_name=interest)
-                # add the interest to the user profile
-                current_user = UserProfile.objects.get(user=request.user)
-                current_user.interests.add(interestObject)
-                current_user.save()
-            except Interest.DoesNotExist:
-                print ("Interest does not exist")
-        return render(request, 'mainapp/profile.html')

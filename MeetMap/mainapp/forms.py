@@ -65,21 +65,3 @@ class CreateProfileForm(forms.ModelForm):
             'description':'Tell us a bit about yourself',
             'interests':'What are you interested in ?'
         }
-
-class ProfileForm(forms.Form):
-    name = forms.CharField(label='What is your full name?', required=False)
-    display_picture = forms.ImageField(label='Upload a picture!', required=False)
-
-    class Meta:
-        model = UserProfile
-        exclude = ['user', 'username', 'whitelist', 'blacklist', 'events']
-        labels = {
-            'description': 'Write a description about yourself!',
-            'interests ': 'What kind of meets are you interested in?',
-        }
-        initial = {
-            'is_private': False
-        }
-
-class AddInterestForm(forms.Form):
-    interest = forms.CharField()
