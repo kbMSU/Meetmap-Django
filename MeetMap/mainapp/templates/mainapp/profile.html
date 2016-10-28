@@ -4,19 +4,24 @@
 
 {% block head %}
     <script src="{% static '/mainapp/js/profile.js' %} "></script>
+    <link href="{% static '/mainapp/css/profile.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content%}
-    <div id="blah">
+<div class="container">
+	<div class="row">
+		 <div class="display top-margin">
+             <div class="well profile">
+                 <div class="col-sm-12">
+                     <div id="desc" class="col-xs-12 col-sm-8">
 
-    </div>
+                     </div>
+                 </div>
+             </div>
+		</div>
+	</div>
+</div>
 
-<a href="{% url 'mainapp:createprofile' %}"class="button">
-                                <center>
-                                <br>
-                                <button id="saveButton" type="submit" class="btn btn-primary button">
-                                Edit Profile
-                                </button>
 
 
 {% endblock %}
