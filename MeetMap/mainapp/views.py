@@ -14,7 +14,7 @@ from .models import UserProfile, Location, Event , Interest
 
 from .forms import LoginForm, RegisterForm, CreateEventForm, GoingToEventForm, AddInterestForm
 from .forms import NotGoingToEventForm, DeleteEventForm, GetEventsForm
-from .forms import ProfileForm, MyMeetsForm
+from .forms import ProfileForm, MyMeetsForm, CreateProfileForm
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -131,6 +131,7 @@ def signup(request):
         'invalidData':invalidData
     }
 
+    return render(request, 'mainapp/signup.html', data)
 
 '''
 Purpose : This view is to create a profile.
@@ -138,47 +139,39 @@ Returns : A ProfileForm if they are yet to complete their profile.
 Alternate : If profile creation is successful user can redirect to map page.
 '''
 def createprofile(request):
-    profileSuccess = False
-    profileFailed = False
-    descriptionMissing = False
-    imageMissing = False
-    invalidData = False
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/')
 
-    profileForm = ProfileForm()
+    error = False
+    invalid_data = False
+    form = CreateProfileForm()
 
-    if request.method == 'POST':
-        profileForm = ProfileForm(request.POST)
-        if profileForm.is_valid():
-            description = profileForm.cleaned_data['description']
-            picture = profileForm.cleaned_data['display_picture']
-
+    if request.method == "POST":
+        form = CreateProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            invalid_data = False
             try:
-                profile = UserProfile.objects.get(user=request.user)
-                if profileForm.data['description']:
-                    profile.description = description
-                    profile.save()
-                if profileForm.data['display_picture']:
-                    profile.display_picture = picture
-                    profile.save()
+                description = form.cleaned_data['description']
+                picture = form.cleaned_data['display_picture']
+                interests = form.cleaned_data['interests']
+
+                user_profile = UserProfile.objects.get(user=request.user)
+                user_profile.description = description
+                user_profile.display_picture = picture
+                user_profile.interests = interests
+                user_profile.save()
+
+                return HttpResponseRedirect('/map/')
             except:
-                profileFailed = True
-            else:
-                profileSuccess = True
+                error = True
         else:
-            if not profileForm.data['description']:
-                descriptionMissing = True
-            if not profileForm.data['display_picture']:
-                imageMissing = True
-            if not imageMissing and not descriptionMissing:
-                invalidData = True
+            print(form.errors)
+            invalid_data = True
 
     data = {
-        'form': profileForm,
-        'profileSuccess': profileSuccess,
-        'profileFailed': profileFailed,
-        'descriptionMissing': descriptionMissing,
-        'imageMissing': imageMissing,
-        'invalidData': invalidData
+        'error':error,
+        'invalid_data':invalid_data,
+        'form':form
     }
 
     return render(request, 'mainapp/createProfile.html', data)
@@ -490,17 +483,17 @@ def get_events(request):
     else:
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
+'''
+Purpose : Get the users profile.
+'''
+@api_view(['GET'])
 def get_profile(request):
-    print("here")
-    if request.user.is_authenticated():
-        my_profile = serializers.serialize("json", UserProfile.objects.filter(user=request.user),
-                                                   use_natural_foreign_keys=True, use_natural_primary_keys=True)
-        #print(my_profile)
-        #print(serialized_profile)
+    user_profile = UserProfile.objects.filter(user=request.user)
+    my_profile = serializers.serialize("json",user_profile,
+                                        use_natural_foreign_keys=True,
+                                        use_natural_primary_keys=True)
 
-        return HttpResponse(my_profile, content_type='application/json')
-    else:
-        return HttpResponseRedirect('/login/')
+    return Response(my_profile, status=status.HTTP_200_OK)
 
 def add_interest(request):
     print("add interest")

@@ -56,6 +56,16 @@ class MyMeetsForm(forms.Form):
     action_type = forms.CharField()
     event_id = forms.IntegerField()
 
+class CreateProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['display_picture','description','interests']
+        labels = {
+            'display_picture':'Pick a profile picture !',
+            'description':'Tell us a bit about yourself',
+            'interests':'What are you interested in ?'
+        }
+
 class ProfileForm(forms.Form):
     name = forms.CharField(label='What is your full name?', required=False)
     display_picture = forms.ImageField(label='Upload a picture!', required=False)
