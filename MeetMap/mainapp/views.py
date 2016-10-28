@@ -85,7 +85,9 @@ def signup(request):
             password1 = registerForm.cleaned_data['password1']
             password2 = registerForm.cleaned_data['password2']
             email = registerForm.cleaned_data['email']
+            # Passwords must match
             if password1 == password2:
+                # Password must have a minimum length
                 if len(password1) > 5:
                     if not User.objects.filter(username=username).exists():
                         try:
