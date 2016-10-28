@@ -84,7 +84,7 @@ class Event(models.Model):
     from_time = models.DateTimeField()
     to_time = models.DateTimeField()
     description = models.CharField(max_length=500,default="")
-    picture = models.ImageField(null=True,upload_to = 'event_pic_folder/')
+    picture = models.ImageField(null=True,upload_to = 'event_pic_folder/', blank=True)
     is_private = models.BooleanField(default=False)
     interests = models.ManyToManyField(Interest)
     creator = models.ForeignKey(UserProfile, on_delete=models.CASCADE)

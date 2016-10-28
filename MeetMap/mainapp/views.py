@@ -8,15 +8,17 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout
 from django.contrib.auth.models import User
+from django.core import serializers
 
 from .models import UserProfile, Location, Event , Interest
-from django.core import serializers
 
 from .forms import LoginForm, RegisterForm, CreateEventForm, GoingToEventForm
 from .forms import NotGoingToEventForm, DeleteEventForm, GetEventsForm
 from .forms import ProfileForm, MyMeetsForm
 
-from django.core import serializers
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 '''
 Purpose : This view is for logging in.
@@ -184,31 +186,17 @@ def createprofile(request):
 
 '''
 Purpose : This view is to view and update the profile
-Returns : ProfileForm
+Returns : None
 Alternate : Redirects to login if user is not authenticated
 '''
 def profile(request):
     if request.user.is_authenticated():
-        print("also here")
         return render(request, 'mainapp/profile.html')
     else:
         return HttpResponseRedirect('/login/')
 
-def get_profile(request):
-    print("here")
-    if request.user.is_authenticated():
-        print("whatduotpfsjfsjdlkjfdsa")
-        my_profile = serializers.serialize("json", UserProfile.objects.filter(user=request.user),
-                                                   use_natural_foreign_keys=True, use_natural_primary_keys=True)
-        #print(my_profile)
-        #print(serialized_profile)
-
-        return HttpResponse(my_profile, content_type='application/json')
-    else:
-        return HttpResponseRedirect('/login/')
-
 '''
-Purpose : This view is see the map
+Purpose : This view is to see the map
 Returns : CreateEventForm to create a new event by clicking on the map
 Alternate : Redirects to login if user is not authenticated
 '''
@@ -265,117 +253,107 @@ def mymeets(request):
 REST Endpoints start here
 '''
 
+'''
+Purpose : Get the details required by the map page
+'''
+@api_view(['GET'])
 def get_user_details(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/')
+    success = False
 
-    current_user = UserProfile.objects.get(user=request.user)
+    try:
+        current_user = UserProfile.objects.get(user=request.user)
 
-    # Get all of the events of this user, minus the ones they created
-    events = Event.objects.filter(
-                        userprofile=current_user
-                        )
-    events_json = serializers.serialize("json", events, use_natural_foreign_keys=True,
-                                        use_natural_primary_keys=True)
-
-    # Get the users interests
-    interests = Interest.objects.filter(userprofile=current_user)
-    interests_json = serializers.serialize("json", interests,
-                                            use_natural_foreign_keys=True,
+        # Get all of the events of this user, minus the ones they created
+        events = Event.objects.filter(
+                            userprofile=current_user
+                            )
+        events_json = serializers.serialize("json", events, use_natural_foreign_keys=True,
                                             use_natural_primary_keys=True)
 
-    # Get ALL interests
-    all_interests = Interest.objects.all()
-    all_interests_json = serializers.serialize("json", all_interests,
+        # Get the users interests
+        interests = Interest.objects.filter(userprofile=current_user)
+        interests_json = serializers.serialize("json", interests,
                                                 use_natural_foreign_keys=True,
                                                 use_natural_primary_keys=True)
 
-    # Get the events to show on the map based on the interests
-    interestArray = []
-    for interest in interests:
-        interestArray += [interest.id]
-    map_events = Event.objects.filter(interests__in=interestArray)
-    map_events_json = serializers.serialize("json",map_events,
-                                            use_natural_foreign_keys=True,
-                                            use_natural_primary_keys=True)
+        # Get ALL interests
+        all_interests = Interest.objects.all()
+        all_interests_json = serializers.serialize("json", all_interests,
+                                                    use_natural_foreign_keys=True,
+                                                    use_natural_primary_keys=True)
+
+        success = True
+    except:
+        success = False
 
     response = {
         'username':current_user.username,
         'events':events_json,
         'interests':interests_json,
-        'map_events':map_events_json,
         'all_interests':all_interests_json
     }
 
-    return JsonResponse(response)
+    if success:
+        return Response(response, status=status.HTTP_200_OK)
+    else:
+        return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 '''
-Purpose : This view is for creating events with POST.
-Returns : JSON response indicating whether the save is successful or failed
-Alternate : 404 error if the user tries to reach this view with a GET
+Purpose : User creates an event.
 '''
+@api_view(['POST'])
 def create_event(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/')
-
     saved = False
     message = "Error creating event"
     errors = None
     meet = None
+    meet_json = None
 
-    if request.method == 'POST':
-        form = CreateEventForm(request.POST, request.FILES)
+    form = CreateEventForm(request.POST, request.FILES)
+    if form.is_valid():
+        street_number = form.cleaned_data['street_number']
+        street_name = form.cleaned_data['street_name']
+        suburb = form.cleaned_data['suburb']
+        city = form.cleaned_data['city']
+        zipcode = form.cleaned_data['zipcode']
+        latitude = form.cleaned_data['latitude']
+        longitude = form.cleaned_data['longitude']
 
-        if form.is_valid():
-            street_number = form.cleaned_data['street_number']
-            street_name = form.cleaned_data['street_name']
-            suburb = form.cleaned_data['suburb']
-            city = form.cleaned_data['city']
-            zipcode = form.cleaned_data['zipcode']
-            latitude = form.cleaned_data['latitude']
-            longitude = form.cleaned_data['longitude']
+        name = form.cleaned_data['name']
+        from_time = form.cleaned_data['from_time']
+        to_time = form.cleaned_data['to_time']
+        description = form.cleaned_data['description']
+        picture = form.cleaned_data['picture']
+        is_private = form.cleaned_data['is_private']
+        interests = form.cleaned_data['interests']
 
-            name = form.cleaned_data['name']
-            from_time = form.cleaned_data['from_time']
-            to_time = form.cleaned_data['to_time']
-            description = form.cleaned_data['description']
-            picture = form.cleaned_data['picture']
-            is_private = form.cleaned_data['is_private']
-            interests = form.cleaned_data['interests']
+        location = Location(street_number=street_number,street_name=street_name,
+            suburb=suburb,city=city,zipcode=zipcode,latitude=latitude,
+            longitude=longitude)
+        location.save()
 
-            location = Location(street_number=street_number,street_name=street_name,
-                suburb=suburb,city=city,zipcode=zipcode,latitude=latitude,
-                longitude=longitude)
-            location.save()
+        current_user = request.user.username
+        profile = UserProfile.objects.get(username=current_user)
 
-            current_user = request.user.username
-            profile = UserProfile.objects.get(username=current_user)
+        meet = Event(name=name,from_time=from_time,to_time=to_time,
+            description=description,is_private=is_private,
+            location=location,creator=profile,picture=picture)
+        meet.save()
+        meet.interests = interests
+        meet.save()
+        profile.events.add(meet)
+        profile.save()
 
-            meet = Event(name=name,from_time=from_time,to_time=to_time,
-                description=description,is_private=is_private,
-                location=location,creator=profile)
-            meet.save()
-            meet.interests = interests
-            meet.save()
-            profile.events.add(meet)
-            profile.save()
+        saved = True
+        message = "Event successfuly created !"
 
-            saved = True
-            message = "Event successfuly created !"
-
-            meet_json = serializers.serialize("json", [meet],
-                                                use_natural_foreign_keys=True,
-                                                use_natural_primary_keys=True)
-        else:
-            saved = False
-            message = "All fields required."
-            errors = form.errors
+        meet_json = serializers.serialize("json", [meet],
+                                            use_natural_foreign_keys=True,
+                                            use_natural_primary_keys=True)
     else:
-        '''
-        The user cannot visit this view from the browser. This view is only for
-        saving events with a POST request
-        '''
-        raise Http404
+        saved = False
+        message = "All fields required."
+        errors = form.errors
 
     data = {
         'saved':saved,
@@ -384,15 +362,16 @@ def create_event(request):
         'meet':meet_json
     }
 
-    return JsonResponse(data)
+    if saved:
+        return Response(data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
+'''
+Purpose : User RSVP to an event.
+'''
+@api_view(['POST'])
 def going_to_event(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/')
-
-    if request.method == 'GET':
-        raise Http404
-
     success = True
     message = 'You are now going to the event !'
 
@@ -414,15 +393,16 @@ def going_to_event(request):
         'message':message
     }
 
-    return JsonResponse(data)
+    if success:
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
+'''
+Purpose : User is no longer going to an event.
+'''
+@api_view(['POST'])
 def not_going_to_event(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/')
-
-    if request.method == 'GET':
-        raise Http404
-
     success = True
     message = 'You are no longer going to the event !'
 
@@ -444,20 +424,22 @@ def not_going_to_event(request):
         'message':message
     }
 
-    return JsonResponse(data)
+    if success:
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
+'''
+Purpose : User deletes an event.
+'''
+@api_view(['POST'])
 def delete_event(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/')
-
-    if request.method == 'GET':
-        raise Http404
-
     success = True
     message = 'The event has been deleted !'
 
     try:
         form = NotGoingToEventForm(request.POST)
+        print(form)
         form.is_valid()
         meet_id = form.cleaned_data['event_id']
         meet = Event.objects.get(pk=meet_id)
@@ -471,31 +453,40 @@ def delete_event(request):
         'message':message
     }
 
-    return JsonResponse(data)
+    if success:
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
+'''
+Purpose : Get events corresponding to a list of interests. To show on the map.
+'''
+@api_view(['POST'])
 def get_events(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('/')
+    success = False
 
-    if request.method == 'GET':
-        raise Http404
+    try:
+        form = GetEventsForm(request.POST)
+        form.is_valid()
+        selected_interests = form.cleaned_data['interests']
+        interests = Interest.objects.filter(interest_name__in=selected_interests)
 
-    form = GetEventsForm(request.POST)
-    form.is_valid()
-    selected_interests = form.cleaned_data['interests']
-    interests = Interest.objects.filter(interest_name__in=selected_interests)
-
-    events = Event.objects.filter(interests__in=interests)
-    print(events)
-    events_json = serializers.serialize("json", events,
-                                        use_natural_foreign_keys=True,
-                                        use_natural_primary_keys=True)
+        events = Event.objects.filter(interests__in=interests)
+        events_json = serializers.serialize("json", events,
+                                            use_natural_foreign_keys=True,
+                                            use_natural_primary_keys=True)
+        success = True
+    except:
+        success = False
 
     data = {
         'events':events_json
     }
 
-    return JsonResponse(data)
+    if success:
+        return Response(data, status=status.HTTP_200_OK)
+    else:
+        return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 def get_my_events(request):
     if request.user.is_authenticated():
@@ -506,5 +497,18 @@ def get_my_events(request):
                                        use_natural_foreign_keys=True, use_natural_primary_keys=True)
         #print(events)
         return HttpResponse(events, content_type='application/json')
+    else:
+        return HttpResponseRedirect('/login/')
+
+def get_profile(request):
+    print("here")
+    if request.user.is_authenticated():
+        print("whatduotpfsjfsjdlkjfdsa")
+        my_profile = serializers.serialize("json", UserProfile.objects.filter(user=request.user),
+                                                   use_natural_foreign_keys=True, use_natural_primary_keys=True)
+        #print(my_profile)
+        #print(serialized_profile)
+
+        return HttpResponse(my_profile, content_type='application/json')
     else:
         return HttpResponseRedirect('/login/')
