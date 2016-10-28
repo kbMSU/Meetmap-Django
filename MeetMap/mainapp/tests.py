@@ -48,3 +48,9 @@ class LoginTestCase(TestCase):
 
         # Assert that the page was returned successfully
         self.assertEqual(response.status_code,200)
+
+class SignupTestCase(TestCase)
+    test_client = None
+
+    def setUp(self):
+        self.test_client = Client()
