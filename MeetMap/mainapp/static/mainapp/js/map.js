@@ -115,6 +115,7 @@ function set_interests() {
         selected_interests.splice(index,1);
       }
     }
+    console.log("getting meets");
     get_meets();
   });
 }
@@ -253,7 +254,9 @@ function get_user_details() {
       interests = JSON.parse(json.all_interests);
       user_interests = JSON.parse(json.interests);
       set_interests();
-
+      console.log("getting meets");
+      get_meets();
+      
       // Place markers for all the events on the map
       /*map_events = JSON.parse(json.map_events);
       markers = [];
@@ -274,6 +277,7 @@ function get_user_details() {
   Retreive all the events that match this user's interests.
 */
 function get_meets() {
+  console.log("got here");
   interests_data = ''
   for(var i=0; i<selected_interests.length; i++) {
     interest = selected_interests[i];
