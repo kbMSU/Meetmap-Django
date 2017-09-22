@@ -500,3 +500,23 @@ def get_profile(request):
                                         use_natural_primary_keys=True)
 
     return Response(my_profile, status=status.HTTP_200_OK)
+
+
+'''
+Purpose : Get the users profile.
+'''
+@api_view(['GET'])
+def logout(request):
+    success = True
+
+    try:
+        logout(request)
+        return HttpResponseRedirect('/')
+    except:
+        success = False
+
+    data = {
+        'success':success
+    }
+
+    return Response(data, status=status.HTTP_400_BAD_REQUEST)

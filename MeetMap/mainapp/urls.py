@@ -17,5 +17,6 @@ urlpatterns = [
     url(r'^delete_event/', views.delete_event, name='deleteevent'),
     url(r'^mymeets/', views.mymeets, name='mymeets'),
     url(r'^get_profile/', views.get_profile, name='get_profile'),
+    url(r'^logout/', views.logout, name='logout'),
     url(r'^', views.login, name='login'),
 ]
